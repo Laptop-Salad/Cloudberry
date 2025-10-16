@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('truck_listings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('truck_type');
+            $table->foreignIdFor(\App\Models\Trucks::class);
             $table->string('available_status');
             $table->float('holding')->nullable();
             $table->timestamps();

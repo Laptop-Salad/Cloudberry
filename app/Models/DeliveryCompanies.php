@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class DeliveryCompanies extends Model
 {
+    use HasFactory;
     protected $fillable = ['co2_delivery_obligations', 'location', 'type', 'cod', 'annual_min_obligation', 'annual_max_obligation', 'weekly_min', 'weekly_max', 'buffer_tank_size', 'constraints'];
 }
