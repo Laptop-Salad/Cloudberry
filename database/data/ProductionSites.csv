@@ -1,0 +1,7 @@
+CO2 Production Sources,Location,Type,System Operating Status,Annual Production (Unit is in Tonnes),Weekly Production (Unit is in Tonnes),Shutdown Periods,Buffer tank size (Unit is in Tonnes)
+Cask Me Another,IV15 9XD,Distillery,Already operating,4500,60-70,"6 weeks in July, 6 weeks over Christmas",80
+Cask Me Another (Expansion),IV15 9XD,Distillery,Go Live on 01/12/2025,4500,70,"6 weeks in July, 6 weeks over Christmas",80
+The Green Scene Machine,YO15 3QL,Biogas - food waste feedstock,Already Operating,7000,140,,30
+The Gas Menagerie,EH42 1LL,Biogas - manure feedstock,Go Live on 01/12/2025,10000,192,,30
+Loch & Loaded,PA8 7AA,Distillery,Go Live on 01/08/2026,13000,250,"6 weeks in July, 6 weeks over Christmas",80
+The Circle of (Carbon) Life,DG7 3YA,Biogas - manure feedstock,Already Operating,7000,135,,100

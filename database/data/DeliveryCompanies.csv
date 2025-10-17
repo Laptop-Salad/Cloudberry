@@ -1,0 +1,8 @@
+CO2 Delivery Obligations,Location,Type,COD,Annual Min Obligation,Annual Max Obligation,Weekly Min,Weekly Max,Buffer tank size,Constraints
+OCO-Loco Labs,BD13 3HG,Carbonation,Already Operating,2000,3000,39,58,40," See ""CDR credit customers"" table for constraints arising from the credit sales "
+Spring Fling Balgrochan,G63 0BZ,Food & Beverage User,Already Operating,750,750,15,15,25,Only accepts CO2 from Cask Me Another & Loch & Loaded that has undergone full Food & Beberage (F&B) spec testing. Would accept CO2 from a biogas site if that was not manure-fed
+Spring Fling Auchterarder,PH3 1PN,Food & Beverage User,Dec-25,750,750,15,15,25,Only accepts CO2 from Cask Me Another & Loch & Loaded that has undergone full F&B spec testing. Would accept CO2 from a biogas site if that was not manure-fed
+The Big Burp,CF33 4RE,Carbonation,Dec-25,5200,6500,100,125,40, None 
+The Big Burp (Expansion),CF33 4RE,Carbonation,Jun-26,5200,6500,100,125,40, None 
+Fish & Ships Shetland Hub,"AB11 5NP, ZE2 9LX",Food & Beverage User,Dec-25,2000,2000,38.5,38.5,40,Only accepts CO2 from  Cask Me Another & Loch & Loaded that has undergone full F&B spec testing. Would accept CO2 from a biogas site if that was not manure-fed
+Fish & Ships Oban Hub,PA37 1SD,Food & Beverage User,Dec-25,2000,2000,38.5,38.5,40,Only accepts CO2 from  Cask Me Another & Loch & Loaded that has undergone full F&B spec testing. Would accept CO2 from a biogas site if that was not manure-fed
