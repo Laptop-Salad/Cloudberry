@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\RouteStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,7 +20,7 @@ return new class extends Migration
             $table->float('distance')->nullable();
             $table->float('emissions')->nullable();
             $table->float('co2_delivered')->nullable();
-            $table->string('status')->default('pending');
+            $table->unsignedTinyInteger('status')->default(RouteStatus::PENDING->value);
             $table->timestamp('scheduled_at')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();

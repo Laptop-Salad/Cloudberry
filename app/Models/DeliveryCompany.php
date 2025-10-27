@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ConstraintType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,7 +23,7 @@ class DeliveryCompany extends Model
         'weekly_min',
         'weekly_max',
         'buffer_tank_size',
-        'constraints'
+        'constraints',
     ];
 
     /**
@@ -43,7 +44,7 @@ class DeliveryCompany extends Model
     /**
      * Get the relationships.
      */
-    public function creditCompany()
+    public function creditCompany(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(CreditCompany::class);
     }
@@ -55,5 +56,36 @@ class DeliveryCompany extends Model
     public function trucks()
     {
         return $this->hasMany(Truck::class);
+    }
+
+    /**
+     * Get constraints with readable keys.
+     */
+    public function getReadableConstraints(): array
+    {
+        $readable = [];
+        foreach ($this->constraints ?? [] as $key => $value) {
+            $type = ConstraintType::tryFrom((int) $key);
+            $readable[$type?->name ?? "Unknown"] = $value;
+        }
+        return $readable;
+    }
+
+    /**
+     * Set constraint.
+     */
+    public function setConstraint(ConstraintType $type, $value): void
+    {
+        $data = $this->constraints ?? [];
+        $data[$type->value] = $value;
+        $this->constraints = $data;
+    }
+
+    /**
+     * Get constraint by enum.
+     */
+    public function getConstraint(ConstraintType $type)
+    {
+        return $this->constraints[$type->value] ?? null;
     }
 }

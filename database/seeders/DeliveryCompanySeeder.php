@@ -29,7 +29,9 @@ class DeliveryCompanySeeder extends Seeder
                     'weekly_min' => $line[6],
                     'weekly_max' => $line[7],
                     'buffer_tank_size' => $line[8],
-                    'constraints' => $line[9],
+                    'constraints' => json_encode([
+                        'constraints'=>$line[9]
+                    ]),
                 );
                 DeliveryCompany::create($delivery_company);
             }

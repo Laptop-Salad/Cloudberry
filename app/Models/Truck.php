@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TruckStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,13 +28,14 @@ class Truck extends Model
     {
         return [
             'co2_capacity' => 'float',
+            'available_status' => TruckStatus::class,
         ];
     }
 
     /**
      * Get the relationships.
      */
-    public function truckType()
+    public function truckType(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(TruckType::class);
     }

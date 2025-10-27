@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\TruckStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('truck_plate')->unique();
             $table->float('co2_capacity');
-            $table->string('available_status')->default('available');
+            $table->unsignedTinyInteger('available_status')->default(TruckStatus::AVAILABLE->value);
             $table->foreignId('truck_type_id')-> nullable()
                 ->constrained('truck_types')->nullOnDelete();
             $table->timestamps();

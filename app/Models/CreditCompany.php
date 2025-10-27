@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ConstraintType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,11 +20,11 @@ class CreditCompany extends Model
         'lca',
         'co2_required',
         'target_delivery_year',
-        'constraints'
+        'constraints',
     ];
 
     /**
-     * Get the relationships.
+     * Get the attributes that should be cast.
      */
     protected function casts(): array
     {
@@ -42,5 +43,36 @@ class CreditCompany extends Model
     public function deliveryCompanies()
     {
         return $this->hasMany(DeliveryCompany::class);
+    }
+
+    /**
+     * Get constraints with readable keys.
+     */
+    public function getReadableConstraints(): array
+    {
+        $readable = [];
+        foreach ($this->constraints ?? [] as $key => $value) {
+            $type = ConstraintType::tryFrom((int) $key);
+            $readable[$type?->name ?? "Unknown"] = $value;
+        }
+        return $readable;
+    }
+
+    /**
+     * Set constraint.
+     */
+    public function setConstraint(ConstraintType $type, $value): void
+    {
+        $data = $this->constraints ?? [];
+        $data[$type->value] = $value;
+        $this->constraints = $data;
+    }
+
+    /**
+     * Get constraint by enum.
+     */
+    public function getConstraint(ConstraintType $type)
+    {
+        return $this->constraints[$type->value] ?? null;
     }
 }

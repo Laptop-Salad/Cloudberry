@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\RouteStatus;
+use App\Enums\TruckStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -36,21 +38,25 @@ class Route extends Model
             'co2_delivered' => 'float',
             'scheduled_at' => 'datetime',
             'completed_at' => 'datetime',
+            'status' => RouteStatus::class,
         ];
     }
 
     /**
      * Get the relationships.
      */
-    public function productionSite(){
+    public function productionSite(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
         return $this->belongsTo(ProductionSite::class);
     }
 
-    public function deliveryCompany(){
+    public function deliveryCompany(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
         return $this->belongsTo(DeliveryCompany::class);
     }
 
-    public function truck(){
+    public function truck(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
         return $this->belongsTo(Truck::class);
     }
 }
