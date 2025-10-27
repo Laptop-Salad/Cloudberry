@@ -25,8 +25,10 @@ class CreditCompanySeeder extends Seeder
                     'lca' => $line[2],
                     'co2_required' => $line[3],
                     'target_delivery_year' => $line[4],
-                    'constraints_on_storage_method' => $line[5],
-                    'constraints_on_co2_source' => $line[6],
+                    'constraints' => json_encode([
+                        'storage_method' => $line[5],
+                        'co2_source' => $line[6],
+                    ]),
                 );
                 CreditCompany::create($credit_company);
             }

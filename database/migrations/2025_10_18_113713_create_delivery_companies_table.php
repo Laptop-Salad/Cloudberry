@@ -22,7 +22,9 @@ return new class extends Migration
             $table->float('weekly_min')->nullable();
             $table->float('weekly_max')->nullable();
             $table->float('buffer_tank_size')->nullable();
-            $table->text('constraints')->nullable();
+            $table->foreignId('credit_company_id')-> nullable()
+                ->constrained('credit_companies')->nullOnDelete();
+            $table->json('constraints')->nullable();
             $table->timestamps();
         });
     }

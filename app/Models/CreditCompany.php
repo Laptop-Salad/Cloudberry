@@ -19,12 +19,11 @@ class CreditCompany extends Model
         'lca',
         'co2_required',
         'target_delivery_year',
-        'constraints_on_storage_method',
-        'constraints_on_co2_source'
+        'constraints'
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * Get the relationships.
      */
     protected function casts(): array
     {
@@ -33,6 +32,15 @@ class CreditCompany extends Model
             'lca' => 'float',
             'co2_required' => 'float',
             'target_delivery_year' => 'float',
+            'constraints' => 'array',
         ];
+    }
+
+    /**
+     * Get the relationships.
+     */
+    public function deliveryCompanies()
+    {
+        return $this->hasMany(DeliveryCompany::class);
     }
 }

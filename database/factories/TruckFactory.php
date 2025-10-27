@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\TruckType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,10 @@ class TruckFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'truck_plate' => strtoupper($this->faker->bothify('TPN-####')),
+            'co2_capacity' => $this->faker->randomElement([20, 32]),
+            'available_status' => $this->faker->randomElement(['available', 'in_use']),
+            'truck_type_id' => TruckType::inRandomOrder()->first()?->id ?? TruckType::factory(),
         ];
     }
 }

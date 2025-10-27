@@ -32,6 +32,20 @@ class ProductionSite extends Model
             'annual_production' => 'float',
             'weekly_production' => 'float',
             'buffer_tank_size' => 'float',
+            'constraints'=>'array',
         ];
+    }
+
+    /**
+     * Get the relationships.
+     */
+    public function routes()
+    {
+        return $this->hasMany(Route::class);
+    }
+
+    public function trucks()
+    {
+        return $this->hasMany(Truck::class);
     }
 }

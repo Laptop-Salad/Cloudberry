@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('truck_plate')->unique();
             $table->float('co2_capacity');
-            $table->string('available_status');
+            $table->string('available_status')->default('available');
+            $table->foreignId('truck_type_id')-> nullable()
+                ->constrained('truck_types')->nullOnDelete();
             $table->timestamps();
         });
     }

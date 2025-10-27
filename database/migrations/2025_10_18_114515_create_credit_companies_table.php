@@ -18,8 +18,7 @@ return new class extends Migration
             $table->float('lca')->nullable();
             $table->float('co2_required')->nullable();
             $table->float('target_delivery_year')->nullable();
-            $table->string('constraints_on_storage_method')->nullable();
-            $table->string('constraints_on_co2_source')->nullable();
+            $table->json('constraints')->nullable();
             $table->timestamps();
         });
     }

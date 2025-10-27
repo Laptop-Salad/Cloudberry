@@ -36,6 +36,24 @@ class DeliveryCompany extends Model
             'weekly_min' => 'float',
             'weekly_max' => 'float',
             'buffer_tank_size' => 'float',
+            'constraints' => 'array'
         ];
+    }
+
+    /**
+     * Get the relationships.
+     */
+    public function creditCompany()
+    {
+        return $this->belongsTo(CreditCompany::class);
+    }
+    public function routes()
+    {
+        return $this->hasMany(Route::class);
+    }
+
+    public function trucks()
+    {
+        return $this->hasMany(Truck::class);
     }
 }

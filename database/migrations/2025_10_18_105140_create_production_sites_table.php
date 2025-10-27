@@ -21,6 +21,7 @@ return new class extends Migration
             $table->float('weekly_production')->nullable();
             $table->string('shutdown_periods')->nullable();
             $table->float('buffer_tank_size')->nullable();
+            $table->json('constraints')->nullable();
             $table->timestamps();
         });
     }

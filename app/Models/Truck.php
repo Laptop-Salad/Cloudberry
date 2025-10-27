@@ -17,6 +17,7 @@ class Truck extends Model
         'truck_plate',
         'co2_capacity',
         'available_status',
+        'truck_type_id',
     ];
 
     /**
@@ -27,5 +28,18 @@ class Truck extends Model
         return [
             'co2_capacity' => 'float',
         ];
+    }
+
+    /**
+     * Get the relationships.
+     */
+    public function truckType()
+    {
+        return $this->belongsTo(TruckType::class);
+    }
+
+    public function routes()
+    {
+        return $this->hasMany(Route::class);
     }
 }
