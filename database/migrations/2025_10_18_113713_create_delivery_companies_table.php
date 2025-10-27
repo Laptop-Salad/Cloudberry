@@ -24,7 +24,7 @@ return new class extends Migration
             $table->float('buffer_tank_size')->nullable();
             $table->foreignId('credit_company_id')-> nullable()
                 ->constrained('credit_companies')->nullOnDelete();
-            $table->json('constraints')->nullable();
+            $table->json('constraints')->default(json_encode([]));
             $table->timestamps();
         });
     }
