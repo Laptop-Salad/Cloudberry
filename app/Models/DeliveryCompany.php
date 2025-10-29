@@ -37,7 +37,7 @@ class DeliveryCompany extends Model
             'weekly_min' => 'float',
             'weekly_max' => 'float',
             'buffer_tank_size' => 'float',
-            'constraints' => 'array'
+            'constraints' => 'array',
         ];
     }
 
