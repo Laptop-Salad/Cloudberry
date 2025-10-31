@@ -61,4 +61,16 @@ class User extends Authenticatable
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
+
+    /**
+     * Assign new all users default Data Analyst role
+     */
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            if ($user->roles()->count() === 0) {
+                $user->assignRole(\App\Enums\RoleType::DATA_ANALYST->value);
+            }
+        });
+    }
 }
