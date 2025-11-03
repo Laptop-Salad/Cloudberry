@@ -26,6 +26,8 @@ class DatabaseSeeder extends Seeder
             DeliveryCompanySeeder::class,
             CreditCompanySeeder::class,
             TruckTypeSeeder::class,
-            TruckSeeder::class]);
+            TruckSeeder::class,
+            RolePermissionSeeder::class
+        ]);
     }
 }
