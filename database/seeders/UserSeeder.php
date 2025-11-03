@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\RoleType;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -15,11 +16,11 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Make sure roles exist
-        $adminRole = Role::where('name', 'Admin')->first();
-        $opsRole = Role::where('name', 'Operations Manager')->first();
-        $analystRole = Role::where('name', 'Data Analyst')->first();
+        $adminRole = Role::where('name', RoleType::ADMIN->value)->first();
+        $opsRole = Role::where('name', RoleType::OPERATIONS_MANAGER->value)->first();
+        $analystRole = Role::where('name', RoleType::DATA_ANALYST->value)->first();
 
-        // Create test users and assign roles
+        // Create users and assign roles
         $admin = User::firstOrCreate(
             ['email' => 'admin@email.com'],
             [
