@@ -33,6 +33,7 @@ class RolePermissionSeeder extends Seeder
             PermissionType::VIEW_DELIVERIES->value,
             PermissionType::MANAGE_PRODUCTION_SITES->value,
             PermissionType::VIEW_PRODUCTION_SITES->value,
+            PermissionType::VIEW_ANALYTICS->value,
         ]);
 
         $analyst->givePermissionTo([
