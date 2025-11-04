@@ -17,6 +17,11 @@ class User extends Authenticatable
     use HasRoles;
 
     /**
+     * Set the guard name
+     */
+    protected $guard_name = 'web';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>

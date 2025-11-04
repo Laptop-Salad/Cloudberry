@@ -15,15 +15,21 @@ class RolePermissionSeeder extends Seeder
      */
     public function run(): void
     {
+        //Set guard name
+        $guard = 'web';
+
         // Create permissions
         foreach (PermissionType::cases() as $permission) {
-            Permission::firstOrCreate(['name' => $permission->value]);
+            Permission::firstOrCreate([
+                'name' => $permission->value,
+                'guard_name' => $guard,
+            ]);
         }
 
         // Create roles
-        $admin = Role::firstOrCreate(['name' => RoleType::ADMIN->value]);
-        $ops = Role::firstOrCreate(['name' => RoleType::OPERATIONS_MANAGER->value]);
-        $analyst = Role::firstOrCreate(['name' => RoleType::DATA_ANALYST->value]);
+        $admin = Role::firstOrCreate(['name' => RoleType::ADMIN->value, 'guard_name' => $guard]);
+        $ops = Role::firstOrCreate(['name' => RoleType::OPERATIONS_MANAGER->value, 'guard_name' => $guard]);
+        $analyst = Role::firstOrCreate(['name' => RoleType::DATA_ANALYST->value, 'guard_name' => $guard]);
 
         // Assign permissions to roles
         $admin->givePermissionTo(Permission::all());
