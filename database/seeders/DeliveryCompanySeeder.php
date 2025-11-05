@@ -27,17 +27,17 @@ class DeliveryCompanySeeder extends Seeder
                 $constraints = [];
 
                 if (str_contains($constraintText, 'credit')) {
-                    $constraints[] = ConstraintType::SEE_CREDIT_COMPANY_CONSTRAINTS->value;
+                    $constraints['delivery_condition'] = ConstraintType::SEE_CREDIT_COMPANY_CONSTRAINTS->value;
                 } elseif (str_contains($constraintText, 'cask')) {
-                    $constraints[] = ConstraintType::ACCEPTS_CO2_FROM_CMA_FULLY_TESTED->value;
+                    $constraints['delivery_condition'] = ConstraintType::ACCEPTS_CO2_FROM_CMA_FULLY_TESTED->value;
                 } elseif (str_contains($constraintText, 'loch')){
-                    $constraints[] = ConstraintType::ACCEPTS_CO2_FROM_LL_FULLY_TESTED->value;
+                    $constraints['delivery_condition'] = ConstraintType::ACCEPTS_CO2_FROM_LL_FULLY_TESTED->value;
                 } elseif (str_contains($constraintText, 'biogas')) {
-                    $constraints[] = ConstraintType::ACCEPTS_CO2_FROM_BIOGAS_NON_MANURE->value;
-                }elseif ($constraintText && $constraintText !== 'none') {
-                    $constraints[] = ConstraintType::NONE->value;
+                    $constraints['delivery_condition'] = ConstraintType::ACCEPTS_CO2_FROM_BIOGAS_NON_MANURE->value;
+                }else {
+                    //Default constraint if no specific match found
+                    $constraints['delivery_condition'] = ConstraintType::NONE->value;
                 }
-
 
                 $delivery_company = [
                     'co2_delivery_obligations' => $line[0] ?? null,

@@ -29,13 +29,13 @@ class CreditCompanySeeder extends Seeder
 
                 if (str_contains($storageConstraint, 'carbonation - oco')) {
                     $constraints['storage_method'] = ConstraintType::MUST_BE_CARBONATION_OCO->value;
-                } elseif ($storageConstraint && $storageConstraint !== 'none') {
+                } else {
                     $constraints['storage_method'] = ConstraintType::NONE->value;
                 }
 
                 if (str_contains($sourceConstraint, 'distillery')) {
                     $constraints['co2_source'] = ConstraintType::MUST_BE_DISTILLERY_SOURCE->value;
-                } elseif ($sourceConstraint && $sourceConstraint !== 'none') {
+                } else {
                     $constraints['co2_source'] = ConstraintType::NONE->value;
                 }
 
