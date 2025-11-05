@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\ConstraintType;
+use App\Models\CreditCompany;
 use App\Models\DeliveryCompany;
 use Illuminate\Database\Seeder;
 
@@ -48,6 +49,7 @@ class DeliveryCompanySeeder extends Seeder
                     'weekly_min' => $line[6] ?? null,
                     'weekly_max' => $line[7] ?? null,
                     'buffer_tank_size' => $line[8] ?? null,
+                    'credit_company_id' => CreditCompany::inRandomOrder()->first()?->id,
                     'constraints'=> $constraints,
                 ];
                 DeliveryCompany::create($delivery_company);
