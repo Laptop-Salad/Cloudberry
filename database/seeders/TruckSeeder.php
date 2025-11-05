@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\TruckStatus;
 use App\Models\Truck;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -23,12 +24,16 @@ class TruckSeeder extends Seeder
                 $truck = array(
                     'truck_plate' => $line[0],
                     'co2_capacity' => $line[1],
-                    'available_status' => \App\Enums\TruckStatus::from((int)$line[2]),
+                    'available_status' => TruckStatus::from((int)$line[2]),
                 );
                 Truck::create($truck);
             }
             $heading = false;
         }
         fclose($csv_path);
+
+        if (Truck::count() === 0) {
+            Truck::factory(5)->create();
+        }
     }
 }

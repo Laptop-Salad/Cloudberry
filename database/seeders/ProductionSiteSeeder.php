@@ -34,5 +34,9 @@ class ProductionSiteSeeder extends Seeder
             $heading = false;
         }
         fclose($csv_path);
+
+        if (ProductionSite::count() === 0) {
+            ProductionSite::factory(5)->create();
+        }
     }
 }

@@ -55,5 +55,9 @@ class DeliveryCompanySeeder extends Seeder
             $heading = false;
         }
         fclose($csv_path);
+
+        if (DeliveryCompany::count() === 0) {
+            DeliveryCompany::factory(5)->create();
+        }
     }
 }

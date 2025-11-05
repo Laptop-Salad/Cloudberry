@@ -52,5 +52,9 @@ class CreditCompanySeeder extends Seeder
             $heading = false;
         }
         fclose($csv_path);
+
+        if (CreditCompany::count() === 0) {
+            CreditCompany::factory(5)->create();
+        }
     }
 }
