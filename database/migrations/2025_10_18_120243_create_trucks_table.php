@@ -19,6 +19,8 @@ return new class extends Migration
             $table->unsignedTinyInteger('available_status')->default(TruckStatus::AVAILABLE->value);
             $table->foreignId('truck_type_id')-> nullable()
                 ->constrained('truck_types')->nullOnDelete();
+            $table->foreignId('production_site_id')-> nullable()->constrained()->nullOnDelete();
+            $table->foreignId('delivery_company_id')-> nullable()->constrained()->nullOnDelete();
             $table->timestamps();
         });
     }

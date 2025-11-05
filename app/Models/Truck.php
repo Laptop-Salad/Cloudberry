@@ -44,4 +44,14 @@ class Truck extends Model
     {
         return $this->hasMany(Route::class);
     }
+
+    public function productionSite(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(ProductionSite::class);
+    }
+
+    public function deliveryCompany(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(DeliveryCompany::class);
+    }
 }
