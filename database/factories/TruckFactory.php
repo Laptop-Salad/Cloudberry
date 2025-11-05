@@ -20,7 +20,10 @@ class TruckFactory extends Factory
         return [
             'truck_plate' => strtoupper($this->faker->bothify('TPN-####')),
             'co2_capacity' => $this->faker->randomElement([20, 32]),
-            'available_status' => $this->faker->randomElement(['available', 'in_use']),
+            'available_status' => $this->faker->randomElement([
+                \App\Enums\TruckStatus::AVAILABLE->value,
+                \App\Enums\TruckStatus::IN_TRANSIT->value,
+                ]),
             'truck_type_id' => TruckType::inRandomOrder()->first()?->id ?? TruckType::factory(),
         ];
     }
