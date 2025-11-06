@@ -16,11 +16,11 @@ class ProductionSite extends Model
      */
     protected $fillable = [
         'name',
-        'location', 'type',
+        'location',
+        'type',
         'system_operating_status',
         'annual_production',
         'weekly_production',
-        'shutdown_periods',
         'buffer_tank_size',
     ];
 

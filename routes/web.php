@@ -17,9 +17,16 @@ Route::middleware(['auth'])->group(function () {
 
     /** Trucks */
     Route::get('trucks', App\Livewire\Trucks\Index::class)->name('trucks');
+
+    /** Production Sites */
     Route::get('production-sites', App\Livewire\ProductionSites\Index::class)->name('production-sites');
+    Route::get('production-sites/{production_site}', App\Livewire\ProductionSites\Show::class)->name('production-sites.show');
+    Route::get('production-sites/{production_site}/events', App\Livewire\ProductionSites\Events::class)->name('production-sites.events');
+
+    /** Delivery Companies */
     Route::get('delivery-companies', App\Livewire\DeliveryCompanies\Index::class)->name('delivery-companies');
 
+    /** Settings */
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');

@@ -44,7 +44,7 @@ class TruckForm extends Form
         // ensure plate isnt taken by another item
         $other_plate = Truck::where('truck_plate', $this->truck_plate)->first();
 
-        if ($other_plate->exists()) {
+        if (isset($other_plate)) {
             if ((isset($this->truck) && $this->truck->id !== $other_plate->id) || !isset($this->truck)) {
                 $this->addError('truck_plate', 'Truck plate already taken');
                 return;
