@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RouteOptimizationController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
@@ -30,5 +31,7 @@ Route::middleware(['auth'])->group(function () {
         )
         ->name('two-factor.show');
 });
+
+Route::post('/routes/optimise', [RouteOptimizationController::class, 'optimise'])->name('routes.optimise');
 
 require __DIR__.'/auth.php';
