@@ -3,7 +3,6 @@
 namespace App\Livewire\ProductionSites;
 
 use App\Models\ProductionSite;
-use App\Models\Truck;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
