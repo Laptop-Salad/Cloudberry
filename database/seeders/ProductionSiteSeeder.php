@@ -26,7 +26,6 @@ class ProductionSiteSeeder extends Seeder
                     'system_operating_status' => $line[3],
                     'annual_production' => $line[4],
                     'weekly_production' => $line[5],
-                    'shutdown_periods' => $line[6],
                     'buffer_tank_size' =>  $line[7],
                 );
                 ProductionSite::create($production_site);

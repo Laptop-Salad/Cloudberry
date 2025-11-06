@@ -47,7 +47,6 @@ class ProductionSiteFactory extends Factory
             'system_operating_status' => $this->faker->randomElement($status),
             'annual_production' => $this->faker->randomFloat(2, 2000, 20000),
             'weekly_production' => $this->faker->randomFloat(2, 50, 500),
-            'shutdown_periods' => $this->faker->randomElement($shutdownExamples),
             'buffer_tank_size' => $this->faker->randomFloat(2, 20, 100),
         ];
     }

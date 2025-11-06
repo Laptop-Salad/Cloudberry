@@ -20,7 +20,6 @@ class ProductionSite extends Model
         'system_operating_status',
         'annual_production',
         'weekly_production',
-        'shutdown_periods',
         'buffer_tank_size',
     ];
 
