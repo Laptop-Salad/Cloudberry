@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 
+require __DIR__.'/auth.php';
+require __DIR__.'/admin.php';
+
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -14,6 +17,8 @@ Route::middleware(['auth'])->group(function () {
 
     /** Trucks */
     Route::get('trucks', App\Livewire\Trucks\Index::class)->name('trucks');
+    Route::get('production-sites', App\Livewire\ProductionSites\Index::class)->name('production-sites');
+    Route::get('delivery-companies', App\Livewire\DeliveryCompanies\Index::class)->name('delivery-companies');
 
     Route::redirect('settings', 'settings/profile');
 
@@ -34,5 +39,3 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::post('/routes/optimise', [RouteOptimizationController::class, 'optimise'])->name('routes.optimise');
-
-require __DIR__.'/auth.php';
