@@ -14,6 +14,25 @@ use Illuminate\Support\Facades\DB;
 class RouteOptimizationService
 {
     /**
+     * Select the best site from the matching ones based on distance/emissions
+     */
+    private function selectBestSite($matchingSites, DeliveryCompany $company): ?ProductionSite
+    {
+        return $matchingSites
+            ->map(function ($site) use ($company) {
+                $distance = $this->estimateDistance($site, $company);
+                return [
+                    "site" => $site,
+                    "distance" => $distance,
+                ];
+            })
+            ->sortBy("distance")
+
+            // Return the site model
+            ->first()["site"];
+    }
+
+    /**
      * Generate optimal routes based on available data
      */
     public function generateOptimisedRoutes(): array
@@ -35,12 +54,15 @@ class RouteOptimizationService
         try {
             foreach ($companies as $company) {
 
-                $matchingSite = $this->findSiteMatchingConstraints($company, $sites);
+                $matchingSites = $this->findSiteMatchingConstraints($company, $sites);
 
-                // If no valid site matches constraints
-                if (!$matchingSite) {
+                if ($matchingSites->isEmpty()) {
                     continue;
                 }
+
+                // Choose best site based on distance (or emissions)
+                $matchingSite = $this->selectBestSite($matchingSites, $company);
+
 
                 $requiredCapacity = $company->weekly_min ?? 0;
 
@@ -89,15 +111,22 @@ class RouteOptimizationService
      */
     private function findSiteMatchingConstraints(DeliveryCompany $company, $sites)
     {
-        $deliveryConstraint = $company->constraints["delivery_condition"] ?? ConstraintType::NONE->value;
+        // Array of constraint values
+        $constraints = $company->constraints ?? [];
 
-        // If Delivery Company says "see Credit Company constraints"
-        if ($deliveryConstraint === ConstraintType::SEE_CREDIT_COMPANY_CONSTRAINTS->value && $company->creditCompany) {
-            $creditConstraints = $company->creditCompany->constraints;
-            $deliveryConstraint = $creditConstraints["co2_source"] ?? ConstraintType::NONE->value;
+        // If company says “see credit company constraints”, merge both arrays
+        if (
+            isset($constraints["delivery_condition"]) &&
+            $constraints["delivery_condition"] === ConstraintType::SEE_CREDIT_COMPANY_CONSTRAINTS->value &&
+            $company->creditCompany
+        ) {
+            $constraints = array_merge(
+                $constraints,
+                $company->creditCompany->constraints ?? []
+            );
         }
 
-        /** Constraint matching rules */
+        /** Map constraints to rule functions */
         $constraintRules = [
             ConstraintType::NONE->value => fn ($site) => true,
 
@@ -106,21 +135,29 @@ class RouteOptimizationService
 
             ConstraintType::ACCEPTS_CO2_FROM_BIOGAS_NON_MANURE->value =>
                 fn ($site) =>
-                    str_contains(strtolower($site->type), "biogas") &&
-                    !str_contains(strtolower($site->type), "manure"),
+                    str_contains(strtolower($site->type), "biogas")
+                    && !str_contains(strtolower($site->type), "manure"),
         ];
 
-        // Ensure constraint exists in the rule map
-        if (!isset($constraintRules[$deliveryConstraint])) {
-            return null;
-        }
+        return $sites->filter(function ($site) use ($constraints, $constraintRules) {
 
-        $rule = $constraintRules[$deliveryConstraint];
+            foreach ($constraints as $constraint) {
+                if (!isset($constraintRules[$constraint])) {
 
-        // Return all matching sites
-        $matchingSites = $sites->filter(fn ($site) => $rule($site));
+                    // Ignore unknown constraint values
+                    continue;
+                }
 
-        return $matchingSites->first();
+                $rule = $constraintRules[$constraint];
+
+                // If any constraint fails, site is invalid
+                if (!$rule($site)) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
     }
 
     /**
