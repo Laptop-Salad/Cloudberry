@@ -17,16 +17,17 @@
                     <flux:navlist.item icon="truck" :href="route('trucks')" :current="request()->routeIs('trucks')" wire:navigate>{{ __('Trucks') }}</flux:navlist.item>
                     <flux:navlist.item icon="home-modern" :href="route('production-sites')" :current="request()->routeIs('production-sites')" wire:navigate>{{ __('Production Sites') }}</flux:navlist.item>
                     <flux:navlist.item icon="arrows-right-left" :href="route('delivery-companies')" :current="request()->routeIs('delivery-companies')" wire:navigate>{{ __('Delivery Companies') }}</flux:navlist.item>
+                    <flux:navlist.item icon="credit-card" :href="route('delivery-companies')" :current="request()->routeIs('delivery-companies')" wire:navigate>{{ __('Credit Companies') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
-
-            <flux:spacer />
 
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Admin')" class="grid">
                     <flux:navlist.item icon="user" :href="route('admin.users')" :current="request()->routeIs('admin.users')" wire:navigate>{{ __('Users') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
+
+            <flux:spacer />
 
             <flux:navlist variant="outline">
                 <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
