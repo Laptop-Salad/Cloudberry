@@ -19,7 +19,7 @@ class RouteOptimizationService
     public function generateOptimisedRoutes(): array
     {
         //Fetch input data
-        $trucks = Truck::where("status", TruckStatus::AVAILABLE->value)->get();
+        $trucks = Truck::where("available_status", TruckStatus::AVAILABLE->value)->get();
         $companies = DeliveryCompany::all();
         $sites = ProductionSite::all();
 
@@ -68,7 +68,7 @@ class RouteOptimizationService
                 ]);
 
                 // Mark truck as unavailable after assignment
-                $truck->update(["status" => TruckStatus::IN_TRANSIT->value]);
+                $truck->update(["available_status" => TruckStatus::IN_TRANSIT->value]);
 
                 $generatedRoutes[] = $route;
             }
@@ -89,16 +89,38 @@ class RouteOptimizationService
      */
     private function findSiteMatchingConstraints(DeliveryCompany $company, $sites)
     {
+        $deliveryConstraint = $company->constraints["delivery_condition"] ?? ConstraintType::NONE->value;
+
+        // If Delivery Company says "see at the Credit Company constraints"
+        if ($deliveryConstraint === ConstraintType::SEE_CREDIT_COMPANY_CONSTRAINTS->value) {
+
+            if ($company->creditCompany) {
+
+                // Retrieve constraint from credit company instead
+                $creditConstraints = $company->creditCompany->constraints;
+
+                $deliveryConstraint = $creditConstraints["co2_source"] ?? ConstraintType::NONE->value;
+            }
+        }
+
         foreach ($sites as $site) {
-            if ($company->constraints["delivery_condition"] === ConstraintType::NONE->value ||
-                $company->constraints["delivery_condition"] === $site->co2_source)
+            if ($deliveryConstraint === ConstraintType::NONE->value)
             {
+                return $site;
+            }
+            if ($deliveryConstraint === ConstraintType::MUST_BE_DISTILLERY_SOURCE->value
+                && str_contains(strtolower($site->type), "distillery")) {
+                return $site;
+            }
+
+            if ($deliveryConstraint === ConstraintType::ACCEPTS_CO2_FROM_BIOGAS_NON_MANURE->value
+                && str_contains(strtolower($site->type), "biogas")
+                && !str_contains(strtolower($site->type), "manure")) {
                 return $site;
             }
         }
         return null;
     }
-
 
     /**
      * Select the best truck (simplest logic: capacity >= requirement and lowest emissions factor)
