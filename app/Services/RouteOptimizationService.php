@@ -91,35 +91,36 @@ class RouteOptimizationService
     {
         $deliveryConstraint = $company->constraints["delivery_condition"] ?? ConstraintType::NONE->value;
 
-        // If Delivery Company says "see at the Credit Company constraints"
-        if ($deliveryConstraint === ConstraintType::SEE_CREDIT_COMPANY_CONSTRAINTS->value) {
-
-            if ($company->creditCompany) {
-
-                // Retrieve constraint from credit company instead
-                $creditConstraints = $company->creditCompany->constraints;
-
-                $deliveryConstraint = $creditConstraints["co2_source"] ?? ConstraintType::NONE->value;
-            }
+        // If Delivery Company says "see Credit Company constraints"
+        if ($deliveryConstraint === ConstraintType::SEE_CREDIT_COMPANY_CONSTRAINTS->value && $company->creditCompany) {
+            $creditConstraints = $company->creditCompany->constraints;
+            $deliveryConstraint = $creditConstraints["co2_source"] ?? ConstraintType::NONE->value;
         }
 
-        foreach ($sites as $site) {
-            if ($deliveryConstraint === ConstraintType::NONE->value)
-            {
-                return $site;
-            }
-            if ($deliveryConstraint === ConstraintType::MUST_BE_DISTILLERY_SOURCE->value
-                && str_contains(strtolower($site->type), "distillery")) {
-                return $site;
-            }
+        /** Constraint matching rules */
+        $constraintRules = [
+            ConstraintType::NONE->value => fn ($site) => true,
 
-            if ($deliveryConstraint === ConstraintType::ACCEPTS_CO2_FROM_BIOGAS_NON_MANURE->value
-                && str_contains(strtolower($site->type), "biogas")
-                && !str_contains(strtolower($site->type), "manure")) {
-                return $site;
-            }
+            ConstraintType::MUST_BE_DISTILLERY_SOURCE->value =>
+                fn ($site) => str_contains(strtolower($site->type), "distillery"),
+
+            ConstraintType::ACCEPTS_CO2_FROM_BIOGAS_NON_MANURE->value =>
+                fn ($site) =>
+                    str_contains(strtolower($site->type), "biogas") &&
+                    !str_contains(strtolower($site->type), "manure"),
+        ];
+
+        // Ensure constraint exists in the rule map
+        if (!isset($constraintRules[$deliveryConstraint])) {
+            return null;
         }
-        return null;
+
+        $rule = $constraintRules[$deliveryConstraint];
+
+        // Return all matching sites
+        $matchingSites = $sites->filter(fn ($site) => $rule($site));
+
+        return $matchingSites->first();
     }
 
     /**
