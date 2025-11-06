@@ -25,7 +25,8 @@ class RouteSeeder extends Seeder
 
         // Basic safety check
         if ($productionSites->isEmpty() || $deliveryCompanies->isEmpty() || $trucks->isEmpty()) {
-            $this->command->warn('Missing dependencies (sites, deliveries, or trucks).');
+            $this->command->warn('Missing dependencies (sites, deliveries, or trucks). Using factories...');
+            Route::factory(5)->create();
             return;
         }
 

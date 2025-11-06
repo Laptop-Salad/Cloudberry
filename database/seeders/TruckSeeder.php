@@ -25,12 +25,14 @@ class TruckSeeder extends Seeder
 
         // Basic safety check
         if ($productionSites->isEmpty() || $deliveryCompanies->isEmpty() || $truckTypes->isEmpty()) {
-            $this->command->warn('Missing dependencies (sites, deliveries, or truck types).');
+            $this->command->warn('Missing dependencies (sites, deliveries, or truck types). Using factories...');
+            Truck::factory(5)->create();
             return;
         }
 
         $heading = true;
         $csv_path = fopen(base_path('/database/data/Trucks.csv'), 'r');
+
         while (($line = fgetcsv($csv_path, 1000, ",")) !== FALSE)
         {
             if(!$heading)

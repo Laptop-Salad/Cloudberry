@@ -16,8 +16,17 @@ class DeliveryCompanySeeder extends Seeder
     {
         DeliveryCompany::truncate();
 
-        $csv_path = fopen(base_path('/database/data/DeliveryCompanies.csv'), 'r');
+        $creditCompanies = CreditCompany::all();
+
+        // Basic safety check
+        if ($creditCompanies->isEmpty()) {
+            $this->command->warn('Missing CreditCompany. Using factory...');
+            DeliveryCompany::factory(5)->create();
+            return;
+        }
+
         $heading = true;
+        $csv_path = fopen(base_path('/database/data/DeliveryCompanies.csv'), 'r');
 
         while (($line = fgetcsv($csv_path, 1000, ',')) !== false)
         {
