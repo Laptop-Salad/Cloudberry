@@ -64,3 +64,11 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+
+@layer base {
+    .basic-table { @apply w-full border-collapse }
+
+    .basic-table th { @apply p-2 border-b text-start font-medium }
+
+    .basic-table td { @apply p-2 }
+}

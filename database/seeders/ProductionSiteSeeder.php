@@ -20,7 +20,7 @@ class ProductionSiteSeeder extends Seeder
             if(!$heading)
             {
                 $production_site = array(
-                    'co2_production_sources' => $line[0],
+                    'name' => $line[0],
                     'location' => $line[1],
                     'type' => $line[2],
                     'system_operating_status' => $line[3],

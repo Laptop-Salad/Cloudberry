@@ -49,7 +49,7 @@ class DeliveryCompanySeeder extends Seeder
                 }
 
                 $delivery_company = [
-                    'co2_delivery_obligations' => $line[0] ?? null,
+                    'name' => $line[0] ?? null,
                     'location' => $line[1] ?? null,
                     'type' => $line[2] ?? null,
                     'cod' => $line[3] ?? null,

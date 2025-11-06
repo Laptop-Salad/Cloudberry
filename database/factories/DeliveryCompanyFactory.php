@@ -41,7 +41,7 @@ class DeliveryCompanyFactory extends Factory
         ];
 
         return [
-            'co2_delivery_obligations' => $this->faker-> company,
+            'name' => $this->faker-> company,
             'location' => $this->faker->postcode,
             'type' => $this->faker->randomElement($types),
             'cod' =>  $this->faker->date,

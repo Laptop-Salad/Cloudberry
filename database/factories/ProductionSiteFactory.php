@@ -41,7 +41,7 @@ class ProductionSiteFactory extends Factory
         ];
 
         return [
-            'co2_production_sources' => $this->faker->company,
+            'name' => $this->faker->company,
             'location' => $this->faker->postcode,
             'type' => $this->faker->randomElement($types),
             'system_operating_status' => $this->faker->randomElement($status),

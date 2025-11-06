@@ -9,11 +9,12 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
-
 Route::middleware(['auth'])->group(function () {
+    Route::view('dashboard', 'dashboard') ->name('dashboard');
+
+    /** Trucks */
+    Route::get('trucks', App\Livewire\Trucks\Index::class)->name('trucks');
+
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');

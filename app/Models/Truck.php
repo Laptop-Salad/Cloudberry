@@ -19,6 +19,8 @@ class Truck extends Model
         'co2_capacity',
         'available_status',
         'truck_type_id',
+        'production_site_id',
+        'delivery_company_id'
     ];
 
     /**

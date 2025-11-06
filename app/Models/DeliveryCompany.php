@@ -15,7 +15,7 @@ class DeliveryCompany extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'co2_delivery_obligations',
+        'name',
         'location',
         'type', 'cod',
         'annual_min_obligation',

@@ -15,7 +15,7 @@ class ProductionSite extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'co2_production_sources',
+        'name',
         'location', 'type',
         'system_operating_status',
         'annual_production',
