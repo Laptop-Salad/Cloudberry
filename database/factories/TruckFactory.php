@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\TruckStatus;
 use App\Models\TruckType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -21,8 +22,8 @@ class TruckFactory extends Factory
             'truck_plate' => strtoupper($this->faker->bothify('TPN-####')),
             'co2_capacity' => $this->faker->randomElement([20, 32]),
             'available_status' => $this->faker->randomElement([
-                \App\Enums\TruckStatus::AVAILABLE->value,
-                \App\Enums\TruckStatus::IN_TRANSIT->value,
+                TruckStatus::AVAILABLE->value,
+                TruckStatus::IN_TRANSIT->value,
                 ]),
             'truck_type_id' => TruckType::inRandomOrder()->first()?->id ?? TruckType::factory(),
         ];

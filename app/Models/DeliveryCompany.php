@@ -65,8 +65,12 @@ class DeliveryCompany extends Model
     {
         $readable = [];
         foreach ($this->constraints ?? [] as $key => $value) {
-            $type = ConstraintType::tryFrom((int) $key);
-            $readable[$type?->name ?? "Unknown"] = $value;
+            if (is_int($value)) {
+                $type = ConstraintType::tryFrom($value);
+                $readable[$key] = $type?->name ?? "Unknown";
+            } else {
+                $readable[$key] = $value;
+            }
         }
         return $readable;
     }
