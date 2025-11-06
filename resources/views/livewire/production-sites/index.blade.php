@@ -21,7 +21,9 @@
         @foreach($this->production_sites as $production_site)
             <tr>
                 <td class="font-medium">
-                    {{$production_site->name}}
+                    <flux:link :href="route('production-sites.show', $production_site->id)">
+                        {{$production_site->name}}
+                    </flux:link>
                     <p class="text-sm font-normal">{{$production_site->type}}</p>
                 </td>
                 <td>{{$production_site->annual_production}} Tonnes</td>
