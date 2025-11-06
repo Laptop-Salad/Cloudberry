@@ -3,6 +3,7 @@
         title="Users"
         subtitle="View and manage all users"
     >
+        <livewire:admin.users.create />
     </x-page-heading>
 
     <table class="basic-table">
