@@ -3,7 +3,7 @@
         title="Delivery Companies"
         subtitle="View and manage all delivery companies"
     >
-        <livewire:credit-companies.create />
+        <livewire:delivery-companies.create />
     </x-page-heading>
 
     <table class="basic-table">
@@ -27,7 +27,7 @@
                         •
                         {{$delivery_company->buffer_tank_size}} Tonnes Buffer
                         •
-                        {{$delivery_company->creditCompany->name}}
+                        {{$delivery_company->creditCompany?->name}}
                     </p>
                 </td>
                 <td>{{$delivery_company->location}}</td>
@@ -37,7 +37,7 @@
                 <td>
                     <flux:button
                         icon="cog-6-tooth"
-                        wire:click="$dispatch('edit-production-site', { 'production-site' : {{$delivery_company->id}}})"
+                        wire:click="$dispatch('edit-delivery-company', { 'delivery_company' : {{$delivery_company->id}}})"
                     >
                         Manage
                     </flux:button>

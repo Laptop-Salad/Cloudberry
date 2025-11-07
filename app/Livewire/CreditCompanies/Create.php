@@ -2,7 +2,6 @@
 
 namespace App\Livewire\CreditCompanies;
 
-use App\Livewire\Trucks\TruckForm;
 use App\Models\CreditCompany;
 use Livewire\Attributes\On;
 use Livewire\Component;

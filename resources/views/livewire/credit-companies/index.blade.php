@@ -32,7 +32,7 @@
                 <td>
                     <flux:button
                         icon="cog-6-tooth"
-                        wire:click="$dispatch('edit-production-site', { 'production-site' : {{$credit_company->id}}})"
+                        wire:click="$dispatch('edit-credit-company', { 'credit_company' : {{$credit_company->id}}})"
                     >
                         Manage
                     </flux:button>

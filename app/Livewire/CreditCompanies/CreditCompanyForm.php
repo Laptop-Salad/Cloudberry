@@ -36,7 +36,7 @@ class CreditCompanyForm extends Form
 
         if (isset($duplicate)) {
             if ((isset($this->credit_company) && $this->credit_company->id !== $duplicate->id) || !isset($this->credit_company)) {
-                $this->addError('credit_company_plate', 'Credit Company name already taken');
+                $this->addError('name', 'Credit Company name already taken');
                 return;
             }
         }
