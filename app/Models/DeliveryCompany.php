@@ -24,6 +24,7 @@ class DeliveryCompany extends Model
         'weekly_max',
         'buffer_tank_size',
         'constraints',
+        'credit_company_id',
     ];
 
     /**

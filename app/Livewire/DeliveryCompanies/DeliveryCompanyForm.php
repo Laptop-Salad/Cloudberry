@@ -38,7 +38,7 @@ class DeliveryCompanyForm extends Form
     public $buffer_tank_size;
 
 
-    #[Validate(['required', 'exists:credit_companies,id'])]
+    #[Validate(['nullable', 'exists:credit_companies,id'])]
     public $credit_company_id;
 
     public function set(DeliveryCompany $delivery_company) {
