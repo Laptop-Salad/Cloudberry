@@ -3,6 +3,7 @@
         title="Production Sites"
         subtitle="View and manage all production sites"
     >
+        <livewire:production-sites.create />
     </x-page-heading>
 
     <table class="basic-table">
