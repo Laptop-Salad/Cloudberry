@@ -3,6 +3,7 @@
         title="Credit Companies"
         subtitle="View and manage all credit companies"
     >
+        <livewire:credit-companies.create />
     </x-page-heading>
 
     <table class="basic-table">
