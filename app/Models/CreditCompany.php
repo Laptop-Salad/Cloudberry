@@ -15,7 +15,7 @@ class CreditCompany extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'cdr_credit_customer',
+        'name',
         'credits_purchased',
         'lca',
         'co2_required',
@@ -32,7 +32,7 @@ class CreditCompany extends Model
             'credits_purchased' => 'float',
             'lca' => 'float',
             'co2_required' => 'float',
-            'target_delivery_year' => 'float',
+            'target_delivery_year' => 'date',
             'constraints' => 'array',
         ];
     }

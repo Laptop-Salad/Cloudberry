@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Enums\ConstraintType;
 use App\Models\CreditCompany;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
 class CreditCompanySeeder extends Seeder
@@ -39,12 +40,18 @@ class CreditCompanySeeder extends Seeder
                     $constraints['co2_source'] = ConstraintType::NONE->value;
                 }
 
+                $target_delivery_year = null;
+
+                if ($line[4]) {
+                    $target_delivery_year = Carbon::createFromFormat('Y-m-d', intval($line[4]) . '-01-01');
+                }
+
                 $credit_company = [
-                    'cdr_credit_customer' => $line[0] ?? null,
+                    'name' => $line[0] ?? null,
                     'credits_purchased' => $line[1] ?? null,
                     'lca' => $line[2] ?? null,
                     'co2_required' => $line[3] ?? null,
-                    'target_delivery_year' => $line[4] ?? null,
+                    'target_delivery_year' => $target_delivery_year,
                     'constraints' => $constraints,
                 ];
                 CreditCompany::create($credit_company);

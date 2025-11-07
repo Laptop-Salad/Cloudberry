@@ -32,7 +32,7 @@ class CreditCompanyFactory extends Factory
         }
 
         return [
-            'cdr_credit_customer' => $this->faker->company,
+            'name' => $this->faker->company,
             'credits_purchased' => $this->faker->randomFloat(2, 100, 5000),
             'lca' => $this->faker->randomFloat(2, 10, 95),
             'co2_required' => $this->faker->randomFloat(2, 100, 5000),
