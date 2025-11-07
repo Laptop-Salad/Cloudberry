@@ -105,7 +105,6 @@ class RouteOptimizationService
         return $generatedRoutes;
     }
 
-
     /**
      * Match delivery constraints with production site CO₂ source
      */
@@ -171,13 +170,52 @@ class RouteOptimizationService
             ->first();
     }
 
+    protected GeocodingService $geo;
+
+    public function __construct(GeocodingService $geo)
+    {
+        $this->geo = $geo;
+    }
+
+    /**
+     * Haversine formula, calculates distance between two lat/lng points in KM
+     */
+    private function calculateDistance(
+        float $lat1, float $lon1,
+        float $lat2, float $lon2
+    ): float {
+
+        $earthRadius = 6371; // km
+
+        $latDiff = deg2rad($lat2 - $lat1);
+        $lonDiff = deg2rad($lon2 - $lon1);
+
+        $a = sin($latDiff / 2) * sin($latDiff / 2) +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($lonDiff / 2) * sin($lonDiff / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadius * $c;
+    }
 
     /**
      * Estimate distance in km, placeholder logic until real distances used
      */
-    private function estimateDistance(ProductionSite $site, DeliveryCompany $company): int
+    private function estimateDistance(ProductionSite $site, DeliveryCompany $company): float
     {
-        return rand(50, 500);
+        $siteCoords = $this->geo->geocodePostcode($site->location);
+        $companyCoords = $this->geo->geocodePostcode($company->location);
+
+        // If geocoder fails, fallback
+        if (!$siteCoords || !$companyCoords) {
+            return rand(50, 500);
+        }
+
+        return $this->calculateDistance(
+            $siteCoords['lat'], $siteCoords['lng'],
+            $companyCoords['lat'], $companyCoords['lng']
+        );
     }
 
 
