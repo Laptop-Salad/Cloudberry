@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\PostcodeCache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 
@@ -12,24 +13,43 @@ class GeocodingService
      */
     public function geocodePostcode(string $postcode): ?array
     {
+        $postcode = strtoupper(trim($postcode));
+
         // Check cache first (prevents hitting the API repeatedly)
-        return Cache::remember("geocode_{$postcode}", now()->addDays(7), function () use ($postcode) {
+        $cached = PostcodeCache::where('postcode', $postcode)->first();
+        if ($cached) {
+            return [
+                'lat' => (float) $cached->latitude,
+                'lng' => (float) $cached->longitude,
+            ];
+        }
 
-            $response = Http::get("https://nominatim.openstreetmap.org/search", [
-                'q' => $postcode,
-                'format' => 'json',
-                'limit' => 1,
-            ]);
+        // Hit API only if not cached
+        $response = Http::timeout(5)->withHeaders([
+            'User-Agent' => 'CarbonCaptureRoutePlanner/1.0',
+        ])->get("https://nominatim.openstreetmap.org/search", [
+            'q' => $postcode,
+            'format' => 'json',
+            'limit' => 1,
+        ]);
 
-            if ($response->successful() && isset($response[0])) {
-                return [
-                    'lat' => (float) $response[0]['lat'],
-                    'lng' => (float) $response[0]['lon'],
-                ];
-            }
-
-            // Handle errors at the call site
+        if (!$response->successful() || !isset($response[0])) {
             return null;
-        });
+        }
+
+        $lat = (float)$response[0]['lat'];
+        $lng = (float)$response[0]['lon'];
+
+        // 3️⃣ Save result permanently
+        PostcodeCache::create([
+            'postcode' => $postcode,
+            'latitude' => $lat,
+            'longitude' => $lng,
+        ]);
+
+        return [
+            'lat' => $lat,
+            'lng' => $lng,
+        ];
     }
 }

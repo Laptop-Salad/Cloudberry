@@ -9,6 +9,7 @@ use App\Models\DeliveryCompany;
 use App\Models\ProductionSite;
 use App\Models\Route;
 use App\Models\Truck;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class RouteOptimizationService
@@ -204,8 +205,13 @@ class RouteOptimizationService
      */
     private function estimateDistance(ProductionSite $site, DeliveryCompany $company): float
     {
-        $siteCoords = $this->geo->geocodePostcode($site->location);
-        $companyCoords = $this->geo->geocodePostcode($company->location);
+        $siteCoords = Cache::remember("coords_{$site->location}", now()->addDays(30), fn() =>
+        $this->geo->geocodePostcode($site->location)
+        );
+
+        $companyCoords = Cache::remember("coords_{$company->location}", now()->addDays(30), fn() =>
+        $this->geo->geocodePostcode($company->location)
+        );
 
         // If geocoder fails, fallback
         if (!$siteCoords || !$companyCoords) {
