@@ -7,7 +7,6 @@ use App\Models\DeliveryCompany;
 use App\Models\ProductionSite;
 use App\Models\Truck;
 use App\Models\TruckType;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class TruckSeeder extends Seeder

@@ -3,8 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\TruckType;
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -24,10 +22,10 @@ class DatabaseSeeder extends Seeder
 
         // Call seeders here
         $this->call([
-            TruckSeeder::class,
+            ProductionSiteSeeder::class,
             CreditCompanySeeder::class,
             DeliveryCompanySeeder::class,
-            ProductionSiteSeeder::class,
+            TruckSeeder::class,
             RouteSeeder::class,
         ]);
     }
