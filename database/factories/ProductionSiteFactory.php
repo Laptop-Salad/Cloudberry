@@ -19,8 +19,8 @@ class ProductionSiteFactory extends Factory
 
         // Example of real UK postcodes
         $postcode = [
-            'AB1 0BS', 'CM0 7AA', 'FK9 5BY', 'HG5 9LR',
-            'IV9 8RT', 'KY7 7EZ', 'ME3 0AL',
+            'CM0 7AA', 'FK9 5BY', 'HG5 9LR', 'G69 6GE',
+            'IV9 8RT', 'KY7 7EZ', 'AB11 5PN', 'OX16 4XD',
         ];
 
         // Example source types

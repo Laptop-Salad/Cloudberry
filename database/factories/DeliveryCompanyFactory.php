@@ -20,8 +20,8 @@ class DeliveryCompanyFactory extends Factory
     {
         // Example of real UK postcodes
         $postcode = [
-            'OX2 0AQ', 'SG4 7AU', 'TF6 6BU', 'WC1E 6AP',
-            'YO43 4BL', 'ZE3 9JN', 'EH77 7AA', 'GL51 9AY',
+            'SG4 7AU', 'WC1E 6AP', 'EH14 1UD', 'DD2 3QT',
+            'YO43 4BL', 'ZE3 9JN', 'GL51 9AY', 'NE12 5SP',
         ];
 
         // Only delivery related constraints
