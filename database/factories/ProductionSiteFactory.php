@@ -16,13 +16,11 @@ class ProductionSiteFactory extends Factory
      */
     public function definition(): array
     {
-        // Example shutdown periods
-        $shutdownExamples = [
-            '6 weeks in July, 6 weeks over Christmas',
-            '4 weeks in August, 3 weeks in December',
-            '2 weeks in June, 4 weeks in December',
-            '3 weeks in September, 3 weeks in January',
-            'No scheduled shutdowns',
+
+        // Example of real UK postcodes
+        $postcode = [
+            'AB1 0BS', 'CM0 7AA', 'FK9 5BY', 'HG5 9LR',
+            'IV9 8RT', 'KY7 7EZ', 'ME3 0AL',
         ];
 
         // Example source types
@@ -42,7 +40,7 @@ class ProductionSiteFactory extends Factory
 
         return [
             'name' => $this->faker->company,
-            'location' => $this->faker->postcode,
+            'location' => $this->faker->randomElement($postcode),
             'type' => $this->faker->randomElement($types),
             'system_operating_status' => $this->faker->randomElement($status),
             'annual_production' => $this->faker->randomFloat(2, 2000, 20000),

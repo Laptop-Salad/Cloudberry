@@ -18,6 +18,12 @@ class DeliveryCompanyFactory extends Factory
      */
     public function definition(): array
     {
+        // Example of real UK postcodes
+        $postcode = [
+            'OX2 0AQ', 'SG4 7AU', 'TF6 6BU', 'WC1E 6AP',
+            'YO43 4BL', 'ZE3 9JN', 'EH77 7AA', 'GL51 9AY',
+        ];
+
         // Only delivery related constraints
         $deliveryConstraints = [
             ConstraintType::ACCEPTS_CO2_FROM_CMA_FULLY_TESTED->value,
@@ -42,7 +48,7 @@ class DeliveryCompanyFactory extends Factory
 
         return [
             'name' => $this->faker-> company,
-            'location' => $this->faker->postcode,
+            'location' => $this->faker->randomElement($postcode),
             'type' => $this->faker->randomElement($types),
             'cod' =>  $this->faker->date,
             'annual_min_obligation' => $this->faker->randomFloat(2, 500, 5500),
