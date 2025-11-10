@@ -24,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('truck_types', function (Blueprint $table) {
-            //
+            $table->dropColumn('fuel_consumption_per_km');
+            $table->dropColumn('emission_factor');
+            $table->dropColumn('fuel_cost_per_km');
         });
     }
 };
