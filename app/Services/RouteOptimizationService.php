@@ -15,19 +15,22 @@ use Illuminate\Support\Facades\DB;
 class RouteOptimizationService
 {
     /**
-     * Select the best site from the matching ones based on distance/emissions
+     * Select the best site from the matching ones based on distance
      */
-    private function selectBestSite($matchingSites, DeliveryCompany $company): ?ProductionSite
+    private function selectBestSite($matchingSites, DeliveryCompany $company, Truck $truck): ?ProductionSite
     {
         return $matchingSites
-            ->map(function ($site) use ($company) {
+            ->map(function ($site) use ($company, $truck) {
                 $distance = $this->estimateDistance($site, $company);
+                $cost = $distance * $truck->truckType->fuel_cost_per_km;
+
                 return [
                     "site" => $site,
                     "distance" => $distance,
+                    "cost" => $cost,
                 ];
             })
-            ->sortBy("distance")
+            ->sortBy("cost")
 
             // Return the site model
             ->first()["site"];
@@ -61,10 +64,6 @@ class RouteOptimizationService
                     continue;
                 }
 
-                // Choose best site based on distance (or emissions)
-                $matchingSite = $this->selectBestSite($matchingSites, $company);
-
-
                 $requiredCapacity = $company->weekly_min ?? 0;
 
                 $truck = $this->assignBestTruck($trucks, $requiredCapacity);
@@ -74,9 +73,14 @@ class RouteOptimizationService
                     continue;
                 }
 
-                // Calculate estimated values (distance + emissions)
+                // Choose best site based on distance
+                $matchingSite = $this->selectBestSite($matchingSites, $company, $truck);
+
+                // Calculate estimated values
                 $distance = $this->estimateDistance($matchingSite, $company);
-                $emissions = $this->estimateEmissions($distance, $truck);
+                $fuelConsumption = $distance * $truck->truckType->fuel_consumption_per_km;
+                $emissions = $distance * $truck->truckType->emission_factor;
+                $cost = $distance * $truck->truckType->fuel_cost_per_km;
                 $co2Delivered = min($requiredCapacity, $truck->co2_capacity);
 
                 // Create the Route entry (the output of the algorithm)
@@ -85,7 +89,9 @@ class RouteOptimizationService
                     "production_site_id" => $matchingSite->id,
                     "delivery_company_id" => $company->id,
                     "distance" => $distance,
+                    "fuel_consumption" => $fuelConsumption,
                     "emissions" => $emissions,
+                    "cost" => $cost,
                     "co2_delivered" => $co2Delivered,
                     "status" => RouteStatus::PENDING->value,
                 ]);
@@ -93,7 +99,7 @@ class RouteOptimizationService
                 // Mark truck as unavailable after assignment
                 $truck->update(["available_status" => TruckStatus::IN_TRANSIT->value]);
 
-                $generatedRoutes[] = $route;
+                $generatedRoutes[] = $route->load(['truck.truckType', 'productionSite', 'deliveryCompany']);
             }
 
             DB::commit();
@@ -161,13 +167,13 @@ class RouteOptimizationService
     }
 
     /**
-     * Select the best truck (simplest logic: capacity >= requirement and lowest emissions factor)
+     * Choose best truck based on lowest operational cost per km
      */
     private function assignBestTruck($trucks, float $requiredCapacity): ?Truck
     {
         return $trucks
             ->filter(fn ($truck) => $truck->co2_capacity >= $requiredCapacity)
-            ->sortBy("emission_factor")
+            ->sortBy(fn ($truck) => $truck->truckType->fuel_cost_per_km)
             ->first();
     }
 
@@ -201,7 +207,7 @@ class RouteOptimizationService
     }
 
     /**
-     * Estimate distance in km, placeholder logic until real distances used
+     * Estimate distance in km
      */
     private function estimateDistance(ProductionSite $site, DeliveryCompany $company): float
     {
@@ -222,14 +228,5 @@ class RouteOptimizationService
             $siteCoords['lat'], $siteCoords['lng'],
             $companyCoords['lat'], $companyCoords['lng']
         );
-    }
-
-
-    /**
-     * Calculate CO₂ emissions = distance × truck emission factor
-     */
-    private function estimateEmissions(float $distance, Truck $truck): float
-    {
-        return $distance * $truck->emission_factor;
     }
 }

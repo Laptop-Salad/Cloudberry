@@ -20,7 +20,9 @@ class Route extends Model
         'delivery_company_id',
         'truck_id',
         'distance',
+        'fuel_consumption',
         'emissions',
+        'cost',
         'co2_delivered',
         'status',
         'scheduled_at',
@@ -34,7 +36,9 @@ class Route extends Model
     {
         return [
             'distance' => 'float',
+            'fuel_consumption' => 'float',
             'emissions' => 'float',
+            'cost' => 'decimal:2',
             'co2_delivered' => 'float',
             'scheduled_at' => 'datetime',
             'completed_at' => 'datetime',

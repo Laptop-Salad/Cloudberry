@@ -42,8 +42,14 @@ class RouteSeeder extends Seeder
                 // Example: distance based on rough simulation of delivery range
                 $distance = fake()->numberBetween(50, 300); // km
 
+                // Estimate fuel consumption
+                $fuelConsumption = $distance * $truck->truckType->fuel_consumption_per_km;
+
                 // Estimate emissions: assume 0.9 kg/km average
                 $emissions = round($distance * 0.9, 2);
+
+                // Estimate cost
+                $cost = $distance * $truck->truckType->fuel_cost_per_km;
 
                 // Estimate CO₂ delivered based on truck capacity (20–32 tonnes)
                 $co2Delivered = min($truck->co2_capacity ?? 32, fake()->randomFloat(2, 15, 32));
@@ -54,7 +60,9 @@ class RouteSeeder extends Seeder
                     'delivery_company_id' => $company->id,
                     'truck_id' => $truck->id,
                     'distance' => $distance,
+                    'fuel_consumption' => $fuelConsumption,
                     'emissions' => $emissions,
+                    'cost' => $cost,
                     'co2_delivered' => $co2Delivered,
                     'status' => RouteStatus::IN_PROGRESS->value,
                     'scheduled_at' => now()->addDays(fake()->numberBetween(1, 10)),
