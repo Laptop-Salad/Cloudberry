@@ -16,6 +16,9 @@ class TruckType extends Model
     protected $fillable = [
         'capacity',
         'count_available',
+        'fuel_consumption_per_km',
+        'emission_factor',
+        'fuel_cost_per_km',
     ];
 
     /**
@@ -26,6 +29,9 @@ class TruckType extends Model
         return [
             'capacity' => 'float',
             'count_available' => 'integer',
+            'fuel_consumption_per_km' => 'float',
+            'emission_factor' => 'float',
+            'fuel_cost_per_km' => 'decimal:4',
         ];
     }
 
