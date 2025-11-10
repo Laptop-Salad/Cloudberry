@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
         ]);
 
-        TruckType::factory(3)->create();
+        TruckType::factory()->twentyTonne()->create();
+        TruckType::factory()->thirtyTwoTonne()->create();
 
         // Call seeders here
         $this->call([

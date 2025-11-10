@@ -18,14 +18,16 @@ class TruckFactory extends Factory
      */
     public function definition(): array
     {
+        $truckType = TruckType::inRandomOrder()->first() ?? TruckType::factory()->twentyTonne()->create();
+
         return [
             'truck_plate' => strtoupper($this->faker->bothify('TPN-####')),
-            'co2_capacity' => $this->faker->randomElement([20, 32]),
+            'truck_type_id' => $truckType->id,
+            'co2_capacity' => $truckType->capacity,
             'available_status' => $this->faker->randomElement([
                 TruckStatus::AVAILABLE->value,
                 TruckStatus::IN_TRANSIT->value,
                 ]),
-            'truck_type_id' => TruckType::inRandomOrder()->first()?->id ?? TruckType::factory(),
         ];
     }
 }

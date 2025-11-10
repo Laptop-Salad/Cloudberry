@@ -16,7 +16,7 @@ class TruckSeeder extends Seeder
      */
     public function run(): void
     {
-        Truck::truncate();
+        Truck::query()->delete();
 
         $productionSites = ProductionSite::all();
         $deliveryCompanies = DeliveryCompany::all();
@@ -25,7 +25,7 @@ class TruckSeeder extends Seeder
         // Basic safety check
         if ($productionSites->isEmpty() || $deliveryCompanies->isEmpty() || $truckTypes->isEmpty()) {
             $this->command->warn('Missing dependencies (sites, deliveries, or truck types). Using factories...');
-            Truck::factory(5)->create();
+            Truck::factory(10)->create();
             return;
         }
 
@@ -51,7 +51,7 @@ class TruckSeeder extends Seeder
         fclose($csv_path);
 
         if (Truck::count() === 0) {
-            Truck::factory(5)->create();
+            Truck::factory(10)->create();
         }
     }
 }
