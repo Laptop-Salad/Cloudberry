@@ -19,7 +19,7 @@ class TruckTypeFactory extends Factory
         // Default, if someone uses factory without specifying state
         return [
             'capacity' => 20,
-            'count_available' => 5,
+            'count_available' => 3,
             'fuel_consumption_per_km' => 0.30,
             'emission_factor' => 0.670,
             'fuel_cost_per_km' => 0.30 * 1.4257,
@@ -30,7 +30,7 @@ class TruckTypeFactory extends Factory
     {
         return $this->state(fn () => [
             'capacity' => 20,
-            'count_available' => 5,
+            'count_available' => 3,
             'fuel_consumption_per_km' => 0.30,
             'emission_factor' => 0.670,
             'fuel_cost_per_km' => 0.30 * 1.4257,
@@ -41,7 +41,7 @@ class TruckTypeFactory extends Factory
     {
         return $this->state(fn () => [
             'capacity' => 32,
-            'count_available' => 5,
+            'count_available' => 2,
             'fuel_consumption_per_km' => 0.36,
             'emission_factor' => 0.667,
             'fuel_cost_per_km' => 0.36 * 1.4257,
