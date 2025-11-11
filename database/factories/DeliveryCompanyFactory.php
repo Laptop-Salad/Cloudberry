@@ -56,7 +56,6 @@ class DeliveryCompanyFactory extends Factory
             'weekly_min' => $this->faker->randomFloat(2, 10, 50),
             'weekly_max' => $this->faker->randomFloat(2, 15, 200),
             'buffer_tank_size' => $this->faker->randomFloat(2, 20, 50),
-            'credit_company_id' => CreditCompany::inRandomOrder()->first()?->id ?? CreditCompany::factory(),
             'constraints' => $constraints,
         ];
     }

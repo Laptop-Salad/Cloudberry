@@ -16,15 +16,6 @@ class DeliveryCompanySeeder extends Seeder
     {
         DeliveryCompany::truncate();
 
-        $creditCompanies = CreditCompany::all();
-
-        // Basic safety check
-        if ($creditCompanies->isEmpty()) {
-            $this->command->warn('Missing CreditCompany. Using factory...');
-            DeliveryCompany::factory(5)->create();
-            return;
-        }
-
         $heading = true;
         $csv_path = fopen(base_path('/database/data/DeliveryCompanies.csv'), 'r');
 
@@ -58,10 +49,20 @@ class DeliveryCompanySeeder extends Seeder
                     'weekly_min' => $line[6] ?? null,
                     'weekly_max' => $line[7] ?? null,
                     'buffer_tank_size' => $line[8] ?? null,
-                    'credit_company_id' => CreditCompany::inRandomOrder()->first()?->id,
                     'constraints'=> $constraints,
                 ];
-                DeliveryCompany::create($delivery_company);
+
+                $deliveryCompany = DeliveryCompany::create($delivery_company);
+
+                // Only assign CreditCompanies if the delivery condition requires it
+                if ($constraints['delivery_condition'] === ConstraintType::SEE_CREDIT_COMPANY_CONSTRAINTS->value) {
+                    CreditCompany::inRandomOrder()
+                        ->limit(3)
+                        ->get()
+                        ->each(function ($creditCompany) use ($deliveryCompany) {
+                            $deliveryCompany->creditCompanies()->save($creditCompany);
+                        });
+                }
             }
             $heading = false;
         }

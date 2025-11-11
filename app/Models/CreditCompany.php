@@ -40,9 +40,9 @@ class CreditCompany extends Model
     /**
      * Get the relationships.
      */
-    public function deliveryCompanies()
+    public function deliveryCompany(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->hasMany(DeliveryCompany::class);
+        return $this->belongsTo(DeliveryCompany::class);
     }
 
     /**
