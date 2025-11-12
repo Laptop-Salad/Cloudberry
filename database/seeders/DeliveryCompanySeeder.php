@@ -53,16 +53,6 @@ class DeliveryCompanySeeder extends Seeder
                 ];
 
                 $deliveryCompany = DeliveryCompany::create($delivery_company);
-
-                // Only assign CreditCompanies if the delivery condition requires it
-                if ($constraints['delivery_condition'] === ConstraintType::SEE_CREDIT_COMPANY_CONSTRAINTS->value) {
-                    CreditCompany::inRandomOrder()
-                        ->limit(3)
-                        ->get()
-                        ->each(function ($creditCompany) use ($deliveryCompany) {
-                            $deliveryCompany->creditCompanies()->save($creditCompany);
-                        });
-                }
             }
             $heading = false;
         }

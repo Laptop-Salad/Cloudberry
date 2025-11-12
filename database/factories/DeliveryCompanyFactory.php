@@ -59,4 +59,22 @@ class DeliveryCompanyFactory extends Factory
             'constraints' => $constraints,
         ];
     }
+
+    public function configure()
+    {
+        return $this->afterCreating(function ($deliveryCompany) {
+
+            // Check if the delivery company requires credit company constraints
+            $requiresCredits =
+                isset($deliveryCompany->constraints['delivery_condition']) &&
+                $deliveryCompany->constraints['delivery_condition'] === ConstraintType::SEE_CREDIT_COMPANY_CONSTRAINTS->value;
+
+            if ($requiresCredits) {
+                // Attach all credit companies without duplicates
+                $deliveryCompany
+                    ->creditCompanies()
+                    ->syncWithoutDetaching(CreditCompany::all()->pluck('id'));
+            }
+        });
+    }
 }

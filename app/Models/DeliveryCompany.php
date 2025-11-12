@@ -44,9 +44,9 @@ class DeliveryCompany extends Model
     /**
      * Get the relationships.
      */
-    public function creditCompanies()
+    public function creditCompanies(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->hasMany(CreditCompany::class);
+        return $this->belongsToMany(CreditCompany::class);
     }
 
     public function routes()
@@ -92,5 +92,14 @@ class DeliveryCompany extends Model
     public function getConstraint(ConstraintType $type)
     {
         return $this->constraints[$type->value] ?? null;
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($deliveryCompany) {
+            if (($deliveryCompany->constraints['delivery_condition'] ?? null) === ConstraintType::SEE_CREDIT_COMPANY_CONSTRAINTS->value) {
+                $deliveryCompany->creditCompanies()->syncWithoutDetaching(CreditCompany::all()->pluck('id'));
+            }
+        });
     }
 }
