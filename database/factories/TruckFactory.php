@@ -18,7 +18,11 @@ class TruckFactory extends Factory
      */
     public function definition(): array
     {
-        $truckType = TruckType::inRandomOrder()->first() ?? TruckType::factory()->twentyTonne()->create();
+        $truckType = TruckType::inRandomOrder()->first();
+
+        if (!$truckType) {
+            throw new \Exception("No TruckType exists. Run TruckTypeSeeder first.");
+        }
 
         return [
             'truck_plate' => strtoupper($this->faker->bothify('TPN-####')),

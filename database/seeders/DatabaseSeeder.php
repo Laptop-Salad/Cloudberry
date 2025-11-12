@@ -16,13 +16,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolePermissionSeeder::class,
             UserSeeder::class,
-        ]);
-
-        TruckType::factory()->twentyTonne()->create();
-        TruckType::factory()->thirtyTwoTonne()->create();
-
-        // Call seeders here
-        $this->call([
+            TruckTypeSeeder::class,
             ProductionSiteSeeder::class,
             CreditCompanySeeder::class,
             DeliveryCompanySeeder::class,
