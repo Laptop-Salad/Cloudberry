@@ -26,6 +26,9 @@ Route::middleware(['auth'])->group(function () {
     /** Delivery Companies */
     Route::get('delivery-companies', App\Livewire\DeliveryCompanies\Index::class)->name('delivery-companies');
 
+    /** Delivery Companies */
+    Route::get('credit-companies', App\Livewire\CreditCompanies\Index::class)->name('credit-companies');
+
     /** Settings */
     Route::redirect('settings', 'settings/profile');
 

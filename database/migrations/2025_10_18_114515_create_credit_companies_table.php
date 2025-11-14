@@ -17,7 +17,7 @@ return new class extends Migration
             $table->float('credits_purchased')->nullable();
             $table->float('lca')->nullable();
             $table->float('co2_required')->nullable();
-            $table->float('target_delivery_year')->nullable();
+            $table->date('target_delivery_year')->nullable();
             $table->json('constraints')->default(json_encode([]));
             $table->timestamps();
         });

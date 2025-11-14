@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Livewire\DeliveryCompanies;
+namespace App\Livewire\CreditCompanies;
 
-use App\Models\DeliveryCompany;
+use App\Models\CreditCompany;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -14,15 +14,14 @@ class Index extends Component
     use WithPagination;
 
     #[Computed]
-    public function deliveryCompanies() {
-        return DeliveryCompany::query()
+    public function creditCompanies() {
+        return CreditCompany::query()
             ->orderBy('name')
             ->paginate(15);
     }
 
     public function render()
     {
-        return view('livewire.delivery-companies.index');
+        return view('livewire.credit-companies.index');
     }
 }
-
