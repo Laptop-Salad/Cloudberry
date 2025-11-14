@@ -26,7 +26,7 @@
     {{-- Mobile toggle button --}}
     <button
             x-on:click="open = true"
-            class="fixed right-4 top-2 p-2 z-40"
+            class="fixed right-4 top-12 p-5 z-40"
     >
         <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16" />
@@ -104,7 +104,7 @@
                 </flux:navlist>
             </div>
 
-            {{-- Documentation --}}
+
             <flux:navlist variant="outline">
                 <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
                     {{ __('Documentation') }}

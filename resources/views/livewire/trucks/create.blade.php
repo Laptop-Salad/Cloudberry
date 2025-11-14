@@ -1,6 +1,6 @@
 <div>
     <flux:modal.trigger wire:click="showForm">
-        <flux:button icon="truck">Create Truck</flux:button>
+        <flux:button icon="truck">Add Truck</flux:button>
     </flux:modal.trigger>
 
     <flux:modal wire:model="show" class="w-6xl">
