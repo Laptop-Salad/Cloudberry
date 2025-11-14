@@ -2,14 +2,11 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
 <head>
     @include('partials.head')
-    <script src="//unpkg.com/alpinejs" defer></script>
 
     <style>
-
         [data-flux-navlist-item]:hover {
             color: #f97316 !important;
         }
-
 
         flux-menu a:hover,
         flux-menu button:hover {
@@ -19,7 +16,6 @@
         flux-menu button:hover span {
             color: #f97316 !important;
         }
-
     </style>
 </head>
 
@@ -28,24 +24,22 @@
 
     <button
             x-on:click="open = true"
-            class="fixed right-4 top-2 z-50 p-2"
+            class="fixed right-4 top-2 z-30 p-2"
     >
         <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
     </button>
 
-
     <div
             x-show="open"
             x-transition.opacity
             x-on:click="open = false"
-            class="fixed inset-0 bg-black/40 z-40"
+            class="fixed inset-0 bg-black/40 z-30"
     ></div>
 
-
     <div
-            class="fixed top-0 right-0 h-full w-72 z-50 transform transition-transform duration-300"
+            class="fixed top-0 right-0 h-full w-72 z-40 transform transition-transform duration-300"
             :style="open ? 'transform: translateX(0);' : 'transform: translateX(100%);'"
     >
         <flux:sidebar
@@ -53,8 +47,6 @@
                 stashable
                 class="w-72 h-full bg-white dark:bg-zinc-900 border-l border-gray-300 dark:border-zinc-700 flex flex-col"
         >
-
-
             <div class="flex justify-end p-4">
                 <button x-on:click="open = false">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2">
@@ -63,20 +55,16 @@
                 </button>
             </div>
 
-
             <div class="px-4 mb-4">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3 font-semibold" wire:navigate>
                     <x-app-logo />
                 </a>
             </div>
 
-
             <div class="px-4 flex-1 overflow-y-auto">
-
                 <p class="uppercase text-gray-600 dark:text-gray-300 font-semibold text-sm mb-2">Platform</p>
 
                 <flux:navlist variant="outline" color="zinc" color-active="orange">
-
                     <flux:navlist.item icon="home"
                                        :href="route('dashboard')"
                                        :current="request()->routeIs('dashboard')"
@@ -111,7 +99,6 @@
                                        wire:navigate>
                         Credit Companies
                     </flux:navlist.item>
-
                 </flux:navlist>
 
                 <hr class="my-5 border-gray-300 dark:border-zinc-700">
@@ -138,13 +125,10 @@
                         Documentation
                     </flux:navlist.item>
                 </flux:navlist>
-
             </div>
-
 
             <div class="border-t border-gray-300 dark:border-zinc-700 p-4">
                 <flux:dropdown align="start" position="top">
-
                     <flux:sidebar.profile
                             :name="auth()->user()->name"
                             :initials="auth()->user()->initials()"
@@ -152,7 +136,6 @@
                     />
 
                     <flux:menu class="w-[240px]">
-
                         <flux:menu.radio.group>
                             <div class="flex items-center gap-2 px-1 py-2">
                                 <span class="h-8 w-8 rounded-lg flex justify-center items-center bg-neutral-200 dark:bg-neutral-700">
@@ -179,11 +162,9 @@
                                 Log Out
                             </flux:menu.item>
                         </form>
-
                     </flux:menu>
                 </flux:dropdown>
             </div>
-
         </flux:sidebar>
     </div>
 </div>

@@ -66,9 +66,28 @@ select:focus[data-flux-control] {
 } */
 
 @layer base {
-    .basic-table { @apply w-full border-collapse }
+    .basic-table {
+        @apply w-full border-collapse;
+    }
 
-    .basic-table th { @apply p-2 border-b text-start font-medium }
+    .basic-table thead {
+        background-color: #EFFF00 !important;
+        color: #000 !important;
+    }
 
-    .basic-table td { @apply p-2 }
+    .dark .basic-table thead {
+        background-color: #EFFF00 !important;
+        color: #000 !important;
+    }
+
+    .basic-table th {
+        @apply p-2 border-b text-start font-medium;
+    }
+
+    .basic-table td {
+        @apply p-2;
+    }
 }
+
+
+
