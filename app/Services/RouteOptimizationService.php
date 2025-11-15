@@ -704,4 +704,61 @@ class RouteOptimizationService
         Cache::forget("routes_week_{$week}_{$year}");
         Cache::forget("routes_summary_week_{$week}_{$year}");
     }
+
+    /**
+     * Auto-complete routes from previous weeks
+     * Releases trucks and buffer capacity for new week
+     */
+    private function autoCompletePreviousWeeks(int $currentWeek, int $currentYear): void
+    {
+        // Calculate the week before current
+        $previousWeek = $currentWeek - 1;
+        $previousYear = $currentYear;
+
+        // Handle year boundary (week 1 should look at previous year's week 52)
+        if ($previousWeek < 1) {
+            $previousWeek = 52;
+            $previousYear = $currentYear - 1;
+        }
+
+        // Complete all routes from weeks before current week
+        Route::where(function($query) use ($currentWeek, $currentYear, $previousYear) {
+            $query->where('year', '<', $currentYear)
+                ->orWhere(function($q) use ($currentWeek, $currentYear) {
+                    $q->where('year', $currentYear)
+                        ->where('week_number', '<', $currentWeek);
+                });
+        })
+            ->whereIn('status', [RouteStatus::PENDING->value, RouteStatus::IN_PROGRESS->value])
+            ->get()
+            ->each(function($route) {
+                $route->complete();
+            });
+    }
+
+    /**
+     * Force regenerate routes for a week (deletes existing and creates new)
+     * Use with caution - deletes existing routes!
+     */
+    public function forceRegenerateWeek(int $week, int $year): array
+    {
+        // Delete existing routes for this week
+        Route::where('week_number', $week)
+            ->where('year', $year)
+            ->delete();
+
+        // Reset all trucks to available
+        Truck::where('available_status', TruckStatus::IN_TRANSIT->value)
+            ->update([
+                'available_status' => TruckStatus::AVAILABLE->value,
+                'production_site_id' => null,
+                'delivery_company_id' => null,
+            ]);
+
+        // Clear cache
+        $this->clearRouteCache($week, $year);
+
+        // Generate fresh routes
+        return $this->generateOptimisedRoutes($week, $year);
+    }
 }
