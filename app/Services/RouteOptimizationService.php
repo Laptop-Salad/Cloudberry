@@ -32,6 +32,27 @@ class RouteOptimizationService
         $weekNumber = $weekNumber ?? now()->weekOfYear;
         $year = $year ?? now()->year;
 
+        // Auto-complete routes from previous weeks (releases resources)
+        $this->autoCompletePreviousWeeks($weekNumber, $year);
+
+        // Check if routes already exist for this week
+        $existingRoutes = Route::where('week_number', $weekNumber)
+            ->where('year', $year)
+            ->exists();
+
+        if ($existingRoutes) {
+            return [
+                'success' => [],
+                'failed' => [],
+                'summary' => [
+                    'error' => 'Routes already generated for this week',
+                    'week' => $weekNumber,
+                    'year' => $year,
+                    'message' => 'Use clearRouteCache() to regenerate if needed',
+                ],
+            ];
+        }
+
         // Fetch only operational entities
         $trucks = Truck::where('available_status', TruckStatus::AVAILABLE->value)->get();
 
@@ -558,5 +579,129 @@ class RouteOptimizationService
         }
 
         return 0;
+    }
+
+    /**
+     * Compare performance metrics between two weeks
+     * Used to evaluate optimization improvements
+     */
+    public function compareWeeklyPerformance(int $week1, int $year1, int $week2, int $year2): array
+    {
+        $metrics1 = $this->getWeekMetrics($week1, $year1);
+        $metrics2 = $this->getWeekMetrics($week2, $year2);
+
+        return [
+            'week_1' => ['week' => $week1, 'year' => $year1] + $metrics1,
+            'week_2' => ['week' => $week2, 'year' => $year2] + $metrics2,
+            'improvements' => [
+                'total_distance_saved' => $metrics1['total_distance'] - $metrics2['total_distance'],
+                'cost_saved' => $metrics1['total_cost'] - $metrics2['total_cost'],
+                'emissions_reduced' => $metrics1['total_emissions'] - $metrics2['total_emissions'],
+                'efficiency_gain_percent' => $this->calculateEfficiencyGain($metrics1, $metrics2),
+            ],
+        ];
+    }
+
+    /**
+     * Get performance metrics for a specific week
+     */
+    public function getWeekMetrics(int $week, int $year): array
+    {
+        $routes = Route::where('week_number', $week)
+            ->where('year', $year)
+            ->get();
+
+        if ($routes->isEmpty()) {
+            return [
+                'routes_count' => 0,
+                'total_co2_delivered' => 0,
+                'total_distance' => 0,
+                'total_cost' => 0,
+                'total_emissions' => 0,
+                'avg_distance_per_tonne' => 0,
+                'avg_cost_per_tonne' => 0,
+                'trucks_used' => 0,
+            ];
+        }
+
+        $totalCO2 = $routes->sum('co2_delivered');
+
+        return [
+            'routes_count' => $routes->count(),
+            'total_co2_delivered' => $totalCO2,
+            'total_distance' => $routes->sum('distance'),
+            'total_cost' => $routes->sum('cost'),
+            'total_emissions' => $routes->sum('emissions'),
+            'avg_distance_per_tonne' => $totalCO2 > 0 ? round($routes->sum('distance') / $totalCO2, 2) : 0,
+            'avg_cost_per_tonne' => $totalCO2 > 0 ? round($routes->sum('cost') / $totalCO2, 2) : 0,
+            'trucks_used' => $routes->unique('truck_id')->count(),
+        ];
+    }
+
+    /**
+     * Calculate efficiency improvement percentage
+     */
+    private function calculateEfficiencyGain(array $metrics1, array $metrics2): float
+    {
+        if ($metrics1['avg_cost_per_tonne'] == 0) {
+            return 0;
+        }
+
+        $improvement = (($metrics1['avg_cost_per_tonne'] - $metrics2['avg_cost_per_tonne'])
+                / $metrics1['avg_cost_per_tonne']) * 100;
+
+        return round($improvement, 2);
+    }
+
+    /**
+     * Cache generated routes for a week (for quick retrieval)
+     * Routes are cached for 7 days after generation
+     */
+    public function cacheWeekRoutes(int $week, int $year): bool
+    {
+        $cacheKey = "routes_week_{$week}_{$year}";
+
+        $routes = Route::with(['truck.truckType', 'productionSite', 'deliveryCompany'])
+            ->where('week_number', $week)
+            ->where('year', $year)
+            ->get();
+
+        if ($routes->isEmpty()) {
+            return false;
+        }
+
+        // Cache for 7 days
+        Cache::put($cacheKey, $routes, now()->addDays(7));
+
+        // Also cache summary metrics
+        $summaryKey = "routes_summary_week_{$week}_{$year}";
+        $summary = $this->getWeekMetrics($week, $year);
+        Cache::put($summaryKey, $summary, now()->addDays(7));
+
+        return true;
+    }
+
+    /**
+     * Get cached routes for a week (or fetch from DB if not cached)
+     */
+    public function getCachedWeekRoutes(int $week, int $year)
+    {
+        $cacheKey = "routes_week_{$week}_{$year}";
+
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($week, $year) {
+            return Route::with(['truck.truckType', 'productionSite', 'deliveryCompany'])
+                ->where('week_number', $week)
+                ->where('year', $year)
+                ->get();
+        });
+    }
+
+    /**
+     * Clear route cache (use when routes are regenerated)
+     */
+    public function clearRouteCache(int $week, int $year): void
+    {
+        Cache::forget("routes_week_{$week}_{$year}");
+        Cache::forget("routes_summary_week_{$week}_{$year}");
     }
 }
