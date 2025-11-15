@@ -73,4 +73,37 @@ class Route extends Model
     {
         return $this->belongsTo(Truck::class);
     }
+
+    /**
+     * Scope: Only routes for current week
+     */
+    public function scopeCurrentWeek($query)
+    {
+        return $query->where('week_number', now()->weekOfYear)
+            ->where('year', now()->year);
+    }
+
+    /**
+     * Scope: Only pending routes
+     */
+    public function scopePending($query)
+    {
+        return $query->where('status', RouteStatus::PENDING);
+    }
+
+    /**
+     * Scope: Only in progress routes
+     */
+    public function scopeInProgress($query)
+    {
+        return $query->where('status', RouteStatus::IN_PROGRESS);
+    }
+
+    /**
+     * Scope: Only completed routes
+     */
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', RouteStatus::COMPLETED);
+    }
 }
