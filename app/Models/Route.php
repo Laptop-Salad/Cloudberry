@@ -106,4 +106,153 @@ class Route extends Model
     {
         return $query->where('status', RouteStatus::COMPLETED);
     }
+
+    /**
+     * Check if this is a multi-trip delivery
+     */
+    public function isMultiTrip(): bool
+    {
+        return $this->total_trips > 1;
+    }
+
+    /**
+     * Get trip progress (e.g., "2/3")
+     */
+    public function getTripProgress(): string
+    {
+        return "{$this->trip_number}/{$this->total_trips}";
+    }
+
+    /**
+     * Get estimated arrival time
+     */
+    public function getEstimatedArrival(): ?\Carbon\Carbon
+    {
+        if (!$this->scheduled_at || !$this->estimated_duration_minutes) {
+            return null;
+        }
+
+        return $this->scheduled_at->addMinutes($this->estimated_duration_minutes);
+    }
+
+    /**
+     * Check if route is overdue
+     */
+    public function isOverdue(): bool
+    {
+        if ($this->status === RouteStatus::COMPLETED) {
+            return false;
+        }
+
+        $estimatedArrival = $this->getEstimatedArrival();
+
+        return $estimatedArrival && now()->isAfter($estimatedArrival);
+    }
+
+    /**
+     * Get human-readable duration
+     */
+    public function getFormattedDuration(): string
+    {
+        if (!$this->estimated_duration_minutes) {
+            return 'N/A';
+        }
+
+        $hours = floor($this->estimated_duration_minutes / 60);
+        $minutes = $this->estimated_duration_minutes % 60;
+
+        if ($hours > 0) {
+            return "{$hours}h {$minutes}m";
+        }
+
+        return "{$minutes}m";
+    }
+
+    /**
+     * Complete this route and handle truck release
+     */
+    public function complete(): void
+    {
+        $this->update([
+            'status' => RouteStatus::COMPLETED,
+            'completed_at' => now(),
+        ]);
+
+        // Check if all trips for this delivery are complete
+        $allTripsComplete = static::where('truck_id', $this->truck_id)
+            ->where('delivery_company_id', $this->delivery_company_id)
+            ->where('week_number', $this->week_number)
+            ->where('year', $this->year)
+            ->where('status', '!=', RouteStatus::COMPLETED->value)
+            ->doesntExist();
+
+        // Release truck if all trips done
+        if ($allTripsComplete && $this->truck) {
+            $this->truck->update([
+                'available_status' => TruckStatus::AVAILABLE->value,
+                'production_site_id' => null,
+                'delivery_company_id' => null,
+            ]);
+        }
+    }
+
+    /**
+     * Start this route (mark as in progress)
+     */
+    public function start(): void
+    {
+        $this->update([
+            'status' => RouteStatus::IN_PROGRESS,
+        ]);
+    }
+
+    /**
+     * Get cost per tonne of CO2
+     */
+    public function getCostPerTonne(): float
+    {
+        if ($this->co2_delivered <= 0) {
+            return 0;
+        }
+
+        return round((float) $this->cost / $this->co2_delivered, 2);
+    }
+
+    /**
+     * Get emissions per tonne of CO2 delivered
+     */
+    public function getEmissionsPerTonne(): float
+    {
+        if ($this->co2_delivered <= 0) {
+            return 0;
+        }
+
+        return round($this->emissions / $this->co2_delivered, 2);
+    }
+
+    /**
+     * Get all related trips (for multi-trip deliveries)
+     */
+    public function getRelatedTrips()
+    {
+        if (!$this->isMultiTrip()) {
+            return collect([$this]);
+        }
+
+        return static::where('delivery_company_id', $this->delivery_company_id)
+            ->where('production_site_id', $this->production_site_id)
+            ->where('truck_id', $this->truck_id)
+            ->where('week_number', $this->week_number)
+            ->where('year', $this->year)
+            ->orderBy('trip_number')
+            ->get();
+    }
+
+    /**
+     * Get total CO2 for all trips in this delivery
+     */
+    public function getTotalDeliveryCapacity(): float
+    {
+        return $this->getRelatedTrips()->sum('co2_delivered');
+    }
 }
