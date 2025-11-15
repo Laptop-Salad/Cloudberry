@@ -26,7 +26,12 @@ class Route extends Model
         'co2_delivered',
         'status',
         'scheduled_at',
-        'completed_at'
+        'completed_at',
+        'week_number',
+        'year',
+        'trip_number',
+        'total_trips',
+        'estimated_duration_minutes',
     ];
 
     /**
@@ -43,6 +48,11 @@ class Route extends Model
             'scheduled_at' => 'datetime',
             'completed_at' => 'datetime',
             'status' => RouteStatus::class,
+            'week_number' => 'integer',
+            'year' => 'integer',
+            'trip_number' => 'integer',
+            'total_trips' => 'integer',
+            'estimated_duration_minutes' => 'integer',
         ];
     }
 
