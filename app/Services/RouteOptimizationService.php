@@ -271,19 +271,26 @@ class RouteOptimizationService
             ];
         }
 
-        // Apply buffer capacity constraint
-        $weeklyMax = $company->weekly_max ?? 58;
-        if ($totalWeeklyRequired > $weeklyMax) {
-            // Scale down all obligations proportionally to fit within weekly_max
-            $scaleFactor = $weeklyMax / $totalWeeklyRequired;
+        // Prioritize credit companies that are furthest behind schedule
+        usort($creditObligations, function($a, $b) {
+            $aProgress = $this->getCreditCompanyProgress($a['credit_company']);
+            $bProgress = $this->getCreditCompanyProgress($b['credit_company']);
+            return $aProgress <=> $bProgress; // Deliver to those most behind first
+        });
 
-            foreach ($creditObligations as &$obligation) {
-                $obligation['weekly_required'] *= $scaleFactor;
+// Fit as many as possible within buffer capacity
+        $weeklyMax = min($company->weekly_max ?? 58, $company->buffer_tank_size);
+        $selectedObligations = [];
+        $totalWeeklyRequired = 0;
+
+        foreach ($creditObligations as $obligation) {
+            if ($totalWeeklyRequired + $obligation['weekly_required'] <= $weeklyMax) {
+                $selectedObligations[] = $obligation;
+                $totalWeeklyRequired += $obligation['weekly_required'];
             }
-            unset($obligation);
-
-            $totalWeeklyRequired = $weeklyMax;
         }
+
+        $creditObligations = $selectedObligations;
 
         // Check company buffer capacity
         $availableBuffer = $this->getCompanyAvailableBuffer($company, $weekNumber, $year);
@@ -415,6 +422,15 @@ class RouteOptimizationService
             'co2_delivered' => $totalCO2,
             'truck_used' => !empty($trucksUsed),
         ];
+    }
+
+    private function getCreditCompanyProgress(CreditCompany $creditCompany): float
+    {
+        $delivered = Route::where('credit_company_id', $creditCompany->id)
+            ->whereIn('status', [RouteStatus::COMPLETED->value, RouteStatus::IN_PROGRESS->value, RouteStatus::PENDING->value])
+            ->sum('co2_delivered');
+
+        return $delivered / $creditCompany->co2_required; // Returns 0.0 to 1.0
     }
 
     /**
@@ -634,7 +650,6 @@ class RouteOptimizationService
         }
 
         // Strategy: Deliver the minimum required
-        // (You can change this to deliver more efficiently, e.g., nearest truck capacity)
         return $weeklyMin;
     }
 
