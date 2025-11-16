@@ -51,6 +51,37 @@ class RouteOptimizationService
             ];
         }
 
+        // Check if trying to skip weeks
+        $lastGeneratedWeek = Route::orderByDesc('year')
+            ->orderByDesc('week_number')
+            ->first();
+
+        if ($lastGeneratedWeek) {
+            $expectedNextWeek = $lastGeneratedWeek->week_number + 1;
+            $expectedNextYear = $lastGeneratedWeek->year;
+
+            // Handle year boundary
+            if ($expectedNextWeek > 52) {
+                $expectedNextWeek = 1;
+                $expectedNextYear++;
+            }
+
+            if ($year != $expectedNextYear || $weekNumber != $expectedNextWeek) {
+                return [
+                    'success' => [],
+                    'failed' => [],
+                    'summary' => [
+                        'error' => 'Cannot skip weeks',
+                        'last_generated_week' => $lastGeneratedWeek->week_number,
+                        'last_generated_year' => $lastGeneratedWeek->year,
+                        'expected_next_week' => $expectedNextWeek,
+                        'expected_next_year' => $expectedNextYear,
+                        'message' => 'Must generate weeks sequentially',
+                    ],
+                ];
+            }
+        }
+
         // Auto-complete routes from previous weeks (releases resources)
         $this->autoCompletePreviousWeeks($weekNumber, $year);
 
