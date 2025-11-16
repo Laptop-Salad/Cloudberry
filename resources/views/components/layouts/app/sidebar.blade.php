@@ -25,8 +25,8 @@
 
     {{-- Mobile toggle button --}}
     <button
-            x-on:click="open = true"
-            class="fixed right-4 top-12 p-5 z-40"
+        x-on:click="open = true"
+        class="fixed right-4 top-12 p-5 z-40"
     >
         <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16" />
@@ -35,20 +35,21 @@
 
     {{-- Overlay --}}
     <div
-            x-show="open"
-            x-transition.opacity
-            x-on:click="open = false"
-            class="fixed inset-0 bg-black/40 z-30"
+        x-cloak
+        x-show="open"
+        x-transition.opacity
+        x-on:click="open = false"
+        class="fixed inset-0 bg-black/40 z-30"
     ></div>
 
     {{-- Sidebar --}}
     <div
-            class="fixed top-0 right-0 h-full w-72 z-40 transform transition-transform duration-300"
-            :style="open ? 'transform: translateX(0);' : 'transform: translateX(100%);'"
+        class="fixed top-0 right-0 h-full w-72 z-40 transform transition-transform duration-300"
+        :style="open ? 'transform: translateX(0);' : 'transform: translateX(100%);'"
     >
         <flux:sidebar
-                sticky
-                class="w-72 h-full bg-white dark:bg-zinc-900 border-l border-gray-300 dark:border-zinc-700 flex flex-col overflow-y-auto"
+            sticky
+            class="w-72 h-full bg-white dark:bg-zinc-900 border-l border-gray-300 dark:border-zinc-700 flex flex-col overflow-y-auto"
         >
 
             {{-- Close button --}}
