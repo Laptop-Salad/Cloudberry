@@ -30,6 +30,9 @@ class RouteSeeder extends Seeder
             return;
         }
 
+        $currentWeek = now()->weekOfYear;
+        $currentYear = now()->year;
+
         // Create logical routes
         foreach ($productionSites as $site) {
             // Each site delivers to 1–2 companies
@@ -45,8 +48,8 @@ class RouteSeeder extends Seeder
                 // Estimate fuel consumption
                 $fuelConsumption = $distance * $truck->truckType->fuel_consumption_per_km;
 
-                // Estimate emissions: assume 0.9 kg/km average
-                $emissions = round($distance * 0.9, 2);
+                // Estimate emissions
+                $emissions = round($distance * $truck->truckType->emission_factor, 2);
 
                 // Estimate cost
                 $cost = $distance * $truck->truckType->fuel_cost_per_km;
@@ -54,10 +57,16 @@ class RouteSeeder extends Seeder
                 // Estimate CO₂ delivered based on truck capacity (20–32 tonnes)
                 $co2Delivered = min($truck->co2_capacity ?? 32, fake()->randomFloat(2, 15, 32));
 
+                // Calculate estimated duration
+                $avgSpeed = 60; // km/h
+                $travelTime = ($distance / $avgSpeed) * 60; // minutes
+                $estimatedDuration = (int) ceil($travelTime + 60); // Add loading/unloading
+
                 // Create route
                 Route::create([
                     'production_site_id' => $site->id,
                     'delivery_company_id' => $company->id,
+                    'credit_company_id' => null, // Regular delivery, no credit company
                     'truck_id' => $truck->id,
                     'distance' => $distance,
                     'fuel_consumption' => $fuelConsumption,
@@ -65,8 +74,14 @@ class RouteSeeder extends Seeder
                     'cost' => $cost,
                     'co2_delivered' => $co2Delivered,
                     'status' => RouteStatus::IN_PROGRESS->value,
+                    'is_early_delivery' => false,
                     'scheduled_at' => now()->addDays(fake()->numberBetween(1, 10)),
                     'completed_at' => null,
+                    'week_number' => $currentWeek,
+                    'year' => $currentYear,
+                    'trip_number' => 1,
+                    'total_trips' => 1,
+                    'estimated_duration_minutes' => $estimatedDuration,
                 ]);
             }
         }

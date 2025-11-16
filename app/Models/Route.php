@@ -18,6 +18,7 @@ class Route extends Model
     protected $fillable = [
         'production_site_id',
         'delivery_company_id',
+        'credit_company_id',
         'truck_id',
         'distance',
         'fuel_consumption',
@@ -25,6 +26,7 @@ class Route extends Model
         'cost',
         'co2_delivered',
         'status',
+        'is_early_delivery',
         'scheduled_at',
         'completed_at',
         'week_number',
@@ -53,6 +55,7 @@ class Route extends Model
             'trip_number' => 'integer',
             'total_trips' => 'integer',
             'estimated_duration_minutes' => 'integer',
+            'is_early_delivery' => 'boolean',
         ];
     }
 
@@ -67,6 +70,11 @@ class Route extends Model
     public function deliveryCompany(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(DeliveryCompany::class);
+    }
+
+    public function creditCompany(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(CreditCompany::class);
     }
 
     public function truck(): \Illuminate\Database\Eloquent\Relations\BelongsTo
