@@ -32,6 +32,25 @@ class RouteOptimizationService
         $weekNumber = $weekNumber ?? now()->weekOfYear;
         $year = $year ?? now()->year;
 
+        // Prevent generating routes for past weeks
+        $currentWeek = now()->weekOfYear;
+        $currentYear = now()->year;
+
+        if ($year < $currentYear || ($year == $currentYear && $weekNumber < $currentWeek)) {
+            return [
+                'success' => [],
+                'failed' => [],
+                'summary' => [
+                    'error' => 'Cannot generate routes for past weeks',
+                    'requested_week' => $weekNumber,
+                    'requested_year' => $year,
+                    'current_week' => $currentWeek,
+                    'current_year' => $currentYear,
+                    'message' => 'Routes can only be generated for current week onwards',
+                ],
+            ];
+        }
+
         // Auto-complete routes from previous weeks (releases resources)
         $this->autoCompletePreviousWeeks($weekNumber, $year);
 
@@ -738,7 +757,6 @@ class RouteOptimizationService
 
     /**
      * Force regenerate routes for a week (deletes existing and creates new)
-     * Use with caution - deletes existing routes!
      */
     public function forceRegenerateWeek(int $week, int $year): array
     {
