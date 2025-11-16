@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\ConstraintType;
 use App\Enums\RouteStatus;
 use App\Enums\TruckStatus;
+use App\Models\CreditCompany;
 use App\Models\DeliveryCompany;
 use App\Models\ProductionSite;
 use App\Models\Route;
@@ -146,13 +147,29 @@ class RouteOptimizationService
         try {
             foreach ($companies as $company) {
                 try {
-                    $routeResult = $this->generateRouteForCompany(
-                        $company,
-                        $sites,
-                        $trucks,
-                        $weekNumber,
-                        $year
-                    );
+                    // Check if this company has credit obligations
+                    $hasCreditObligations = ($company->constraints['delivery_condition'] ?? null)
+                        === ConstraintType::SEE_CREDIT_COMPANY_CONSTRAINTS->value;
+
+                    if ($hasCreditObligations) {
+                        // Handle OCO-Loco Labs with credit company splitting
+                        $routeResult = $this->generateRoutesForCreditCompany(
+                            $company,
+                            $sites,
+                            $trucks,
+                            $weekNumber,
+                            $year
+                        );
+                    } else {
+                        // Handle regular delivery companies
+                        $routeResult = $this->generateRouteForCompany(
+                            $company,
+                            $sites,
+                            $trucks,
+                            $weekNumber,
+                            $year
+                        );
+                    }
 
                     if ($routeResult['success']) {
                         $results['success'] = array_merge($results['success'], $routeResult['routes']);
@@ -193,6 +210,257 @@ class RouteOptimizationService
         }
 
         return $results;
+    }
+
+    /**
+     * Generate routes for companies with credit obligations (OCO-Loco Labs)
+     * Splits deliveries by credit company constraints
+     */
+    private function generateRoutesForCreditCompany(
+        DeliveryCompany $company,
+                        $sites,
+                        $trucks,
+        int $weekNumber,
+        int $year
+    ): array {
+        // Get credit companies for current year AND future years (early delivery)
+        $creditCompanies = $company->creditCompanies()
+            ->where(function($query) use ($year) {
+                $query->whereYear('target_delivery_year', $year)
+                    ->orWhereYear('target_delivery_year', '>', $year);
+            })
+            ->orderBy('target_delivery_year', 'asc') // Prioritize current year first
+            ->get();
+
+        if ($creditCompanies->isEmpty()) {
+            return [
+                'success' => false,
+                'reason' => 'No credit companies with obligations',
+            ];
+        }
+
+        // Calculate weekly obligations using adaptive scheduling
+        $creditObligations = [];
+        $totalWeeklyRequired = 0;
+
+        foreach ($creditCompanies as $creditCompany) {
+            $weeklyRequired = $this->calculateWeeklyObligation(
+                $creditCompany,
+                $weekNumber,
+                $year
+            );
+
+            // Skip if no delivery needed this week
+            if ($weeklyRequired <= 0) {
+                continue;
+            }
+
+            $creditObligations[] = [
+                'credit_company' => $creditCompany,
+                'weekly_required' => $weeklyRequired,
+                'constraints' => $creditCompany->constraints ?? [],
+            ];
+            $totalWeeklyRequired += $weeklyRequired;
+        }
+
+        // If no obligations this week, skip
+        if (empty($creditObligations)) {
+            return [
+                'success' => false,
+                'reason' => 'No credit company obligations due this week',
+            ];
+        }
+
+        // Apply buffer capacity constraint
+        $weeklyMax = $company->weekly_max ?? 58;
+        if ($totalWeeklyRequired > $weeklyMax) {
+            // Scale down all obligations proportionally to fit within weekly_max
+            $scaleFactor = $weeklyMax / $totalWeeklyRequired;
+
+            foreach ($creditObligations as &$obligation) {
+                $obligation['weekly_required'] *= $scaleFactor;
+            }
+            unset($obligation);
+
+            $totalWeeklyRequired = $weeklyMax;
+        }
+
+        // Check company buffer capacity
+        $availableBuffer = $this->getCompanyAvailableBuffer($company, $weekNumber, $year);
+        if ($availableBuffer < $totalWeeklyRequired) {
+            return [
+                'success' => false,
+                'reason' => 'Insufficient buffer tank capacity for credit obligations',
+                'details' => [
+                    'required' => $totalWeeklyRequired,
+                    'available_buffer' => $availableBuffer,
+                ],
+            ];
+        }
+
+        $allRoutes = [];
+        $totalTrips = 0;
+        $totalCO2 = 0;
+        $trucksUsed = [];
+
+        // Generate routes for each credit company's portion
+        foreach ($creditObligations as $obligation) {
+            $creditCompany = $obligation['credit_company'];
+            $weeklyRequired = $obligation['weekly_required'];
+            $constraints = $obligation['constraints'];
+
+            // Find sites matching this specific credit company's constraints
+            $matchingSites = $this->findSitesMatchingCreditConstraints(
+                $constraints,
+                $sites,
+                $weeklyRequired,
+                $weekNumber,
+                $year
+            );
+
+            if ($matchingSites->isEmpty()) {
+                Log::warning('No sites match credit company constraints', [
+                    'credit_company' => $creditCompany->name,
+                    'constraints' => $constraints,
+                ]);
+                continue;
+            }
+
+            // Select best truck for this portion
+            $truck = $this->assignBestTruck($trucks, $weeklyRequired);
+            if (!$truck) {
+                Log::warning('No available truck for credit company', [
+                    'credit_company' => $creditCompany->name,
+                    'required' => $weeklyRequired,
+                ]);
+                continue;
+            }
+
+            // Select best site
+            $bestSite = $this->selectBestSite($matchingSites, $company, $truck);
+
+            // Check site buffer
+            $siteAvailableBuffer = $this->getSiteAvailableBuffer($bestSite, $weekNumber, $year);
+            if ($siteAvailableBuffer < $weeklyRequired) {
+                Log::warning('Site buffer insufficient', [
+                    'site' => $bestSite->name,
+                    'required' => $weeklyRequired,
+                    'available' => $siteAvailableBuffer,
+                ]);
+                continue;
+            }
+
+            // Calculate trips and generate routes
+            $tripsNeeded = $this->calculateTripsNeeded($weeklyRequired, $truck);
+            $distance = $this->estimateDistance($bestSite, $company);
+
+            $fuelConsumption = $distance * $truck->truckType->fuel_consumption_per_km;
+            $emissions = $distance * $truck->truckType->emission_factor;
+            $cost = $distance * $truck->truckType->fuel_cost_per_km;
+            $estimatedDuration = $this->calculateEstimatedDuration($distance);
+
+            $remainingCapacity = $weeklyRequired;
+
+            for ($trip = 1; $trip <= $tripsNeeded; $trip++) {
+                $tripCapacity = min($truck->co2_capacity, $remainingCapacity);
+
+                $route = Route::create([
+                    'truck_id' => $truck->id,
+                    'production_site_id' => $bestSite->id,
+                    'delivery_company_id' => $company->id,
+                    'credit_company_id' => $creditCompany->id, // NEW: Track which credit company
+                    'distance' => $distance,
+                    'fuel_consumption' => $fuelConsumption,
+                    'emissions' => $emissions,
+                    'cost' => $cost,
+                    'co2_delivered' => $tripCapacity,
+                    'status' => RouteStatus::PENDING->value,
+                    'week_number' => $weekNumber,
+                    'year' => $year,
+                    'trip_number' => $trip,
+                    'total_trips' => $tripsNeeded,
+                    'estimated_duration_minutes' => $estimatedDuration,
+                    'scheduled_at' => now()->addWeek()->startOfWeek()->addDays(($trip - 1)),
+                    'is_early_delivery' => $creditCompany->target_delivery_year->year > $year, // Track early deliveries
+                ]);
+
+                $allRoutes[] = $route->load(['truck.truckType', 'productionSite', 'deliveryCompany']);
+                $remainingCapacity -= $tripCapacity;
+                $totalTrips++;
+                $totalCO2 += $tripCapacity;
+            }
+
+            // Mark truck as in transit
+            if (!in_array($truck->id, $trucksUsed)) {
+                $truck->update([
+                    'available_status' => TruckStatus::IN_TRANSIT->value,
+                    'production_site_id' => $bestSite->id,
+                    'delivery_company_id' => $company->id,
+                ]);
+                $trucksUsed[] = $truck->id;
+            }
+        }
+
+        if (empty($allRoutes)) {
+            return [
+                'success' => false,
+                'reason' => 'Could not generate routes for any credit companies',
+            ];
+        }
+
+        return [
+            'success' => true,
+            'routes' => $allRoutes,
+            'trips' => $totalTrips,
+            'co2_delivered' => $totalCO2,
+            'truck_used' => !empty($trucksUsed),
+        ];
+    }
+
+    /**
+     * Find sites matching specific credit company constraints
+     */
+    private function findSitesMatchingCreditConstraints(
+        array $constraints,
+              $sites,
+        float $requiredCapacity,
+        int $weekNumber,
+        int $year
+    ) {
+        $storageConstraint = $constraints['storage_method'] ?? ConstraintType::NONE->value;
+        $sourceConstraint = $constraints['co2_source'] ?? ConstraintType::NONE->value;
+
+        return $sites->filter(function ($site) use (
+            $sourceConstraint,
+            $storageConstraint,
+            $requiredCapacity,
+            $weekNumber,
+            $year
+        ) {
+            // Check weekly production capacity
+            $weeklyProduction = $this->parseWeeklyProduction($site->weekly_production);
+            if ($weeklyProduction < $requiredCapacity) {
+                return false;
+            }
+
+            // Check remaining capacity
+            $remainingCapacity = $this->getRemainingWeeklyCapacity($site, $weekNumber, $year);
+            if ($remainingCapacity < $requiredCapacity) {
+                return false;
+            }
+
+            // Apply source constraint
+            if ($sourceConstraint === ConstraintType::MUST_BE_DISTILLERY_SOURCE->value) {
+                if (stripos($site->type, 'Distillery') === false) {
+                    return false;
+                }
+            }
+
+            // Storage constraint (MUST_BE_CARBONATION_OCO) doesn't filter sites,
+            // it's about how the CO2 is stored at the destination
+
+            return true;
+        });
     }
 
     /**
@@ -305,6 +573,7 @@ class RouteOptimizationService
                 'truck_id' => $truck->id,
                 'production_site_id' => $matchingSite->id,
                 'delivery_company_id' => $company->id,
+                'credit_company_id' => null,
                 'distance' => $distance,
                 'fuel_consumption' => $fuelConsumption,
                 'emissions' => $emissions,
@@ -381,19 +650,6 @@ class RouteOptimizationService
     ) {
         $constraints = $company->constraints ?? [];
 
-        // If company references credit company constraints, merge them
-        if (
-            isset($constraints['delivery_condition']) &&
-            $constraints['delivery_condition'] === ConstraintType::SEE_CREDIT_COMPANY_CONSTRAINTS->value
-        ) {
-            $creditCompanies = $company->creditCompanies;
-
-            foreach ($creditCompanies as $creditCompany) {
-                $creditConstraints = $creditCompany->constraints ?? [];
-                $constraints = array_merge($constraints, $creditConstraints);
-            }
-        }
-
         // Map constraints to rule functions
         $constraintRules = [
             ConstraintType::NONE->value => fn($site) => true,
@@ -412,8 +668,6 @@ class RouteOptimizationService
             ConstraintType::ACCEPTS_CO2_FROM_LL_FULLY_TESTED->value =>
                 fn($site) => $site->name === 'Loch & Loaded',
 
-            ConstraintType::MUST_BE_CARBONATION_OCO->value =>
-                fn($site) => true, // Storage method constraint, not site-specific
         ];
 
         return $sites->filter(function ($site) use (
@@ -809,5 +1063,70 @@ class RouteOptimizationService
 
         // Generate fresh routes
         return $this->generateOptimisedRoutes($week, $year);
+    }
+
+    /**
+     * Calculate adaptive weekly obligation based on remaining weeks and buffer constraints
+     * Front loads deliveries early in the year when capacity allows
+     * Includes early delivery of future year obligations to maximize buffer usage
+     */
+    private function calculateWeeklyObligation(
+        CreditCompany $creditCompany,
+        int $currentWeek,
+        int $year
+    ): float {
+        // Get already delivered amount for this credit company (all time)
+        $delivered = Route::where('credit_company_id', $creditCompany->id)
+            ->whereIn('status', [
+                RouteStatus::COMPLETED->value,
+                RouteStatus::IN_PROGRESS->value,
+                RouteStatus::PENDING->value
+            ])
+            ->sum('co2_delivered');
+
+        // Calculate remaining obligation
+        $remaining = $creditCompany->co2_required - $delivered;
+
+        if ($remaining <= 0) {
+            return 0; // Already fulfilled
+        }
+
+        // Determine if this is current year or future year obligation
+        $targetYear = $creditCompany->target_delivery_year->year;
+        $isCurrentYear = ($targetYear == $year);
+        $isFutureYear = ($targetYear > $year);
+
+        if ($isCurrentYear) {
+            // Current year obligation - must deliver within this year
+            $remainingWeeks = 52 - $currentWeek + 1;
+
+            if ($remainingWeeks <= 0) {
+                return 0;
+            }
+
+            // Base weekly amount (spread remaining evenly)
+            return $remaining / $remainingWeeks;
+        }
+
+        if ($isFutureYear) {
+            // Future year obligation - early delivery strategy
+            // Calculate weeks until target year
+            $weeksUntilTarget = (($targetYear - $year) * 52) - $currentWeek;
+
+            if ($weeksUntilTarget <= 0) {
+                // Should have been delivered already
+                return $remaining / 52; // Catch-up mode
+            }
+
+            // Spread across remaining time, but deliver at a steady pace
+            // This allows us to use spare buffer capacity efficiently
+            $baseWeekly = $remaining / $weeksUntilTarget;
+
+            // For future obligations, we deliver more conservatively
+            // Only fill remaining buffer capacity after current year needs
+            return $baseWeekly * 0.8; // 80% pace for future deliveries
+        }
+
+        return 0;
     }
 }

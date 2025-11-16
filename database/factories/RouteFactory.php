@@ -24,7 +24,7 @@ class RouteFactory extends Factory
         return [
             'production_site_id' => ProductionSite::inRandomOrder()->first()?->id ?? ProductionSite::factory(),
             'delivery_company_id' => DeliveryCompany::inRandomOrder()->first()?->id ?? DeliveryCompany::factory(),
-            'credit_company'  => null,
+            'credit_company_id'  => null,
             'truck_id' => Truck::inRandomOrder()->first()?->id ?? Truck::factory(),
             'distance' => $distance = fake()->randomFloat(2, 10, 400),
             'fuel_consumption' => $distance * fake()->randomFloat(2, 0.25, 0.36),
