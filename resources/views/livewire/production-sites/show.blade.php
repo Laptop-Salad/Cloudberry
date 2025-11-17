@@ -1,24 +1,28 @@
 <div>
     <x-production-sites.header />
 
-    {{-- NOTE: Not displaying shutdown periods here because we have the events tab --}}
-    {{-- NOTE: Name displayed in header --}}
 
-    <p>Location</p>
-    <p>{{$this->production_site->location}}</p>
+    <table class="basic-table mt-6">
+        <thead>
+        <tr>
+            <th>Location</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Annual Production</th>
+            <th>Weekly Production</th>
+            <th>Buffer Tank Size</th>
+        </tr>
+        </thead>
 
-    <p>Type</p>
-    <p>{{$this->production_site->type}}</p>
-
-    <p>Status</p>
-    <p>{{$this->production_site->system_operating_status}}</p>
-
-    <p>Annual Production</p>
-    <p>{{$this->production_site->annual_production}}</p>
-
-    <p>Weekly Production</p>
-    <p>{{$this->production_site->weekly_production}}</p>
-
-    <p>Buffer Tank Size</p>
-    <p>{{$this->production_site->buffer_tank_size}}</p>
+        <tbody>
+        <tr>
+            <td class="font-medium">{{ $this->production_site->location }}</td>
+            <td>{{ $this->production_site->type }}</td>
+            <td>{{ $this->production_site->system_operating_status }}</td>
+            <td>{{ $this->production_site->annual_production }}</td>
+            <td>{{ $this->production_site->weekly_production }}</td>
+            <td>{{ $this->production_site->buffer_tank_size }}</td>
+        </tr>
+        </tbody>
+    </table>
 </div>

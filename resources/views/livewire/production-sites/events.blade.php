@@ -1,8 +1,6 @@
 <div>
     <x-production-sites.header />
 
-    <livewire:production-sites.events.create :$production_site />
-
     <table class="basic-table mt-8">
         <thead>
         <tr>
