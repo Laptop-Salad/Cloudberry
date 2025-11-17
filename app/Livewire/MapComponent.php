@@ -8,15 +8,43 @@ use App\Models\Route;
 use App\Services\GeocodingService;
 use Carbon\Carbon;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class MapComponent extends Component
 {
+    #[Url]
+    public $search_trucks = '';
+
+    #[Url]
+    public $search_sites = '';
+
+    public function updatedSearchSites()
+    {
+        $this->dispatch('map-update',
+            sites: $this->production_sites,
+            delivery_companies: $this->delivery_companies,
+            routes: $this->routes
+        );
+    }
+
+    public function updatedSearchTrucks()
+    {
+        $this->dispatch('map-update',
+            sites: $this->production_sites,
+            delivery_companies: $this->delivery_companies,
+            routes: $this->routes
+        );
+    }
+
     #[Computed]
     public function productionSites() {
         $geocoding_service = new GeocodingService();
 
-        return ProductionSite::all()->map(function ($site) use ($geocoding_service) {
+        return ProductionSite::query()
+            ->when(!empty($this->search_sites), fn($query) => $query->where('name', 'like', "%{$this->search_sites}%"))
+            ->get()
+            ->map(function ($site) use ($geocoding_service) {
             $coords = $geocoding_service->geocodePostcode($site->location);
 
             return [
@@ -31,7 +59,10 @@ class MapComponent extends Component
     public function deliveryCompanies() {
         $geocoding_service = new GeocodingService();
 
-        return DeliveryCompany::all()->map(function ($site) use ($geocoding_service) {
+        return DeliveryCompany::query()
+            ->when(!empty($this->search_sites), fn($query) => $query->where('name', 'like', "%{$this->search_sites}%"))
+            ->get()
+            ->map(function ($site) use ($geocoding_service) {
             $coords = $geocoding_service->geocodePostcode($site->location);
 
             return [
@@ -48,6 +79,7 @@ class MapComponent extends Component
 
         return Route::query()
             ->where('week_number', Carbon::now()->isoWeek)
+            ->when(!empty($this->search_trucks), fn($query) => $query->whereHas('truck', fn($query) => $query->where('truck_plate', 'like', "%{$this->search_trucks}%")))
             ->get()
             ->map(function ($route) use ($geocoding_service) {
                 return [
