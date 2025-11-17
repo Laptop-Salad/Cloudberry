@@ -66,7 +66,12 @@
                         color: color,
                         weight: 4
                     }).addTo(this.map)
-                        .bindPopup(`Route for ${route.company}`);
+                        .bindPopup(`Route for ${route.company}`)
+                        .bindTooltip(`Route for ${route.truck_plate}`, {
+                            permanent: true,
+                            direction: "center",
+                            className: "route-label"
+                        });
                 });
             }
         }
