@@ -1,46 +1,62 @@
 <div>
     <x-page-heading
-        :title="$this->truck->truck_plate"
-        subtitle="View and truck {{$this->truck->truck_plate}}"
-    />
+            :title="$this->truck->truck_plate"
+            subtitle="View truck {{ $this->truck->truck_plate }}"
+    >
+        <livewire:trucks.create />
+    </x-page-heading>
 
-    <p>Description</p>
-    <p>{{$this->truck->truck_plate}}</p>
+    <table class="basic-table">
+        <thead>
+        <tr>
+            <th>Description</th>
+            <th>Capacity</th>
+            <th>Truck Type</th>
+            <th>Production Site</th>
+            <th>Delivery Company</th>
+            <th>Status</th>
+        </tr>
+        </thead>
 
-    <p>Capacity</p>
-    <p>{{$this->truck->co2_capacity}} Tonnes</p>
+        <tbody>
+        <tr>
+            <td class="font-medium">{{ $this->truck->truck_plate }}</td>
+            <td>{{ $this->truck->co2_capacity }} Tonnes</td>
+            <td>{{ $this->truck->truckType->name }}</td>
+            <td>{{ $this->truck->productionSite?->name ?? '-' }}</td>
+            <td>{{ $this->truck->deliveryCompany?->name ?? '-' }}</td>
+            <td>
+                <x-trucks.status :status="$this->truck->available_status" />
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
-    <p>Truck Type</p>
-    <p>{{$this->truck->truckType->name}}</p>
+    <div class="mt-20"></div>
 
-    <p>Production Site</p>
-    <p>{{$this->truck->productionSite?->name}}</p>
+    <table class="basic-table mt-4">
+        <thead>
+        <tr>
+            <th>Emissions</th>
+            <th>Fuel Used</th>
+            <th>Scheduled At</th>
+            <th>Completed At</th>
+            <th>Distance</th>
+            <th>Cost</th>
+        </tr>
+        </thead>
 
-    <p>Delivery Company</p>
-    <p>{{$this->truck->deliveryCompany?->name}}</p>
-
-    <p>Status</p>
-    <p>{{$this->truck->available_status->display()}}</p>
-
-    <flux:heading>Routes</flux:heading>
-
-    @foreach($this->truck->routes as $route)
-        <p>Emissions used</p>
-        <p>{{$route->emissions}}</p>
-
-        <p>Fuel used</p>
-        <p>{{$route->fuel_consumption}}</p>
-
-        <p>Scheduled At</p>
-        <p>{{$route->scheduled_at?->format('d-m-Y')}}</p>
-
-        <p>Completed At</p>
-        <p>{{$route->completed_at?->format('d-m-Y')}}</p>
-
-        <p>Distance</p>
-        <p>{{$route->distance}}</p>
-
-        <p>Cost</p>
-        <p>£{{$route->cost}}</p>
-    @endforeach
+        <tbody>
+        @foreach($this->truck->routes as $route)
+            <tr>
+                <td>{{ $route->emissions }}</td>
+                <td>{{ $route->fuel_consumption }}</td>
+                <td>{{ $route->scheduled_at?->format('d-m-Y') }}</td>
+                <td>{{ $route->completed_at?->format('d-m-Y') }}</td>
+                <td>{{ $route->distance }}</td>
+                <td>£{{ $route->cost }}</td>
+            </tr>
+        @endforeach
+        </tbody>
+    </table>
 </div>
