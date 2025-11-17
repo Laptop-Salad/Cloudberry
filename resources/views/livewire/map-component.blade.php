@@ -1,24 +1,57 @@
-<div x-data="mapComponent()" x-init="initMap()">
-    <div id="map" style="height:500px; width:100%;" class="relative !z-10"></div>
+<div>
+    <div class="flex space-x-2">
+        <flux:input
+            label="Site Search"
+        />
+
+        <flux:input
+            label="Truck Search"
+        />
+    </div>
+
+    <div class="mt-8 relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
+        <div
+            x-data="mapComponent({
+                sites: @js($this->production_sites),
+                delivery_companies: @js($this->delivery_companies)
+            })"
+            x-init="initMap()"
+        >
+            <div id="map" style="height:500px; width:100%;" class="relative !z-10"></div>
+        </div>
+    </div>
 </div>
 
 <script>
-    function mapComponent() {
+    function mapComponent({ sites, delivery_companies }) {
         return {
             map: null,
+
             initMap() {
-                // Center on UK (roughly)
                 this.map = L.map('map').setView([54.5, -3], 6);
 
-                // Add OpenStreetMap tiles
-                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; OpenStreetMap contributors'
-                }).addTo(this.map);
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png')
+                    .addTo(this.map);
 
-                // Example: add a marker
-                L.marker([51.5074, -0.1278]).addTo(this.map) // London
-                    .bindPopup('Example site')
-                    .openPopup();
+                sites.forEach(site => {
+                    L.marker([site.lat, site.lng]).addTo(this.map)
+                        .bindPopup(site.name);
+                });
+
+                const redIcon = new L.Icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41]
+                });
+
+                delivery_companies.forEach(site => {
+                    L.marker([site.lat, site.lng], { icon: redIcon })
+                        .addTo(this.map)
+                        .bindPopup(site.name);
+                });
             }
         }
     }
