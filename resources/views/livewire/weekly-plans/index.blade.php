@@ -3,7 +3,7 @@
         title="Weekly Plans"
         subtitle="View and manage all weekly plans"
     >
-        <livewire:credit-companies.create />
+        <livewire:weekly-plans.create />
     </x-page-heading>
 
     <table class="basic-table">
