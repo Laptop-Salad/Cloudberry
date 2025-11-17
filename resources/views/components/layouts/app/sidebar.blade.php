@@ -44,8 +44,9 @@
 
     {{-- Sidebar --}}
     <div
-        class="fixed top-0 right-0 h-full w-72 z-40 transform transition-transform duration-300"
-        :style="open ? 'transform: translateX(0);' : 'transform: translateX(100%);'"
+         x-cloak
+         class="fixed top-0 right-0 h-full w-72 z-40 transform transition-transform duration-300 translate-x-full"
+         :class="{ 'translate-x-0': open, 'translate-x-full': !open }"
     >
         <flux:sidebar
             sticky
@@ -116,7 +117,7 @@
                 </flux:navlist.item>
             </flux:navlist>
 
-            {{-- Profile dropdown (now visible on all screen sizes) --}}
+            {{-- Profile dropdown --}}
             <flux:dropdown class="block lg:block" position="bottom" align="start">
                 <flux:profile
                         :name="auth()->user()->name"
