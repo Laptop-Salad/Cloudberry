@@ -1,5 +1,9 @@
 <div>
-    <div class="flex space-x-2">
+    <p class="text-2xl font-semibold">Map</p>
+
+    <flux:separator />
+
+    <div class="flex space-x-2 mt-8">
         <flux:input
             label="Site Search"
             wire:model.live="search_sites"
