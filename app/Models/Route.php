@@ -177,31 +177,32 @@ class Route extends Model
     }
 
     /**
-     * Complete this route and handle truck release
+     * Complete the route with realistic completion time
      */
-    public function complete(): void
+    public function complete()
     {
+        if (!in_array($this->status, [RouteStatus::PENDING, RouteStatus::IN_PROGRESS])) {
+            throw new \Exception('Can only complete pending or in-progress routes');
+        }
+
+        // Calculate realistic completion time based on schedule + duration
+        $estimatedCompletion = $this->scheduled_at
+            ->copy()
+            ->addMinutes($this->estimated_duration_minutes);
+
         $this->update([
             'status' => RouteStatus::COMPLETED,
-            'completed_at' => now(),
+            'completed_at' => $estimatedCompletion,
         ]);
 
-        // Check if all trips for this delivery are complete
-        $allTripsComplete = static::where('truck_id', $this->truck_id)
-            ->where('delivery_company_id', $this->delivery_company_id)
-            ->where('week_number', $this->week_number)
-            ->where('year', $this->year)
-            ->where('status', '!=', RouteStatus::COMPLETED->value)
-            ->doesntExist();
+        // Release truck back to available
+        $this->truck->update([
+            'available_status' => TruckStatus::AVAILABLE,
+            'production_site_id' => null,
+            'delivery_company_id' => null,
+        ]);
 
-        // Release truck if all trips done
-        if ($allTripsComplete && $this->truck) {
-            $this->truck->update([
-                'available_status' => TruckStatus::AVAILABLE->value,
-                'production_site_id' => null,
-                'delivery_company_id' => null,
-            ]);
-        }
+        return $this;
     }
 
     /**
