@@ -99,8 +99,6 @@ new #[Layout('components.layouts.auth')] class extends Component {
         <img src="/Logo.png" class="login-logo" alt="Logo">
     </div>
 
-
-
     @if (! $this->showForm)
         <button
                 wire:click="revealForm"
@@ -108,27 +106,28 @@ new #[Layout('components.layouts.auth')] class extends Component {
         >
             LOGIN
         </button>
-
     @endif
-
 
     @if ($this->showForm)
         <div
                 x-data
                 x-cloak
-
                 x-show="@entangle('showForm')"
-
                 x-transition:enter="transition-all duration-500 ease-out"
                 x-transition:enter-start="opacity-0 scale-y-0 -translate-y-4"
                 x-transition:enter-end="opacity-100 scale-y-100 translate-y-0"
-
                 class="login-box expanding-box"
         >
 
             <h2 class="login-title">LOGIN</h2>
 
             <x-auth-session-status class="text-center" :status="session('status')" />
+
+            @if ($errors->any())
+                <div class="login-error" style="color:red; text-align:center; margin-bottom:10px;">
+                    {{ $errors->first() }}
+                </div>
+            @endif
 
             <form method="POST" wire:submit="login" class="login-form">
                 @csrf
@@ -149,7 +148,6 @@ new #[Layout('components.layouts.auth')] class extends Component {
                         autocomplete="current-password"
                         viewable
                 />
-
 
                 <div class="login-button-wrapper">
                     <flux:button type="submit" class="login-button">
