@@ -19,7 +19,7 @@
         @foreach($this->weekly_plans as $weekly_plan)
             <tr>
                 <td class="font-medium">
-                    <flux:link>
+                    <flux:link :href="route('weekly-plans.show', $weekly_plan['week_number'])">
                         Week {{$weekly_plan['week_number']}}
                     </flux:link>
                 </td>
@@ -38,4 +38,8 @@
         @endforeach
         </tbody>
     </table>
+
+    <div>
+        {{$this->weekly_plans->paginate()}}
+    </div>
 </div>

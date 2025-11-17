@@ -27,7 +27,6 @@ class Index extends Component
                     'total_cost' => $routes->sum('cost'),
                 ];
             });
-
     }
 
     public function render()

@@ -32,6 +32,7 @@ Route::middleware(['auth'])->group(function () {
 
     /** Credit Companies */
     Route::get('weekly-plans', App\Livewire\WeeklyPlans\Index::class)->name('weekly-plans');
+    Route::get('weekly-plans/{weekly_plan_no}', App\Livewire\WeeklyPlans\Show::class)->name('weekly-plans.show');
 
     /** Settings */
     Route::redirect('settings', 'settings/profile');
