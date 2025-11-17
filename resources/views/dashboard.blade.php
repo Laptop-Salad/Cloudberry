@@ -3,8 +3,18 @@
         <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
             <livewire:map-component />
         </div>
-        <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
-            <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20" />
+        <div class="flex space-x-2">
+            <flux:input
+                label="Site Search"
+            />
+
+            <flux:input
+                label="Truck Search"
+            />
+        </div>
+
+        <div class="lg:grid grid-cols-2">
+            <livewire:dashboard.upcoming-events />
         </div>
     </div>
 </x-layouts.app>
