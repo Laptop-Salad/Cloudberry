@@ -89,8 +89,12 @@
                         Delivery Companies
                     </flux:navlist.item>
 
-                    <flux:navlist.item icon="credit-card" :href="route('delivery-companies')" :current="request()->routeIs('delivery-companies')" wire:navigate>
+                    <flux:navlist.item icon="credit-card" :href="route('credit-companies')" :current="request()->routeIs('credit-companies')" wire:navigate>
                         Credit Companies
+                    </flux:navlist.item>
+
+                    <flux:navlist.item icon="calendar" :href="route('weekly-plans')" :current="request()->routeIs('weekly-plans')" wire:navigate>
+                        Weekly Plans
                     </flux:navlist.item>
                 </flux:navlist>
 
