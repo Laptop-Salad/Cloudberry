@@ -2,9 +2,7 @@
 
 namespace App\Livewire\WeeklyPlans;
 
-use App\Models\CreditCompany;
 use App\Models\Route;
-use Carbon\Carbon;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -27,6 +25,13 @@ class Index extends Component
                     'total_cost' => $routes->sum('cost'),
                 ];
             });
+    }
+
+    public function printPlan($week_number) {
+        $this->redirectRoute('weekly-plans.show', [
+            'weekly_plan_no' => $week_number,
+            'print_now' => true,
+        ]);
     }
 
     public function render()

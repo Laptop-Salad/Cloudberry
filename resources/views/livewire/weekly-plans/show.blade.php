@@ -1,4 +1,13 @@
-<div>
+<div
+    x-data="{
+        initPrint() {
+            @if($this->print_now != 0)
+                window.print();
+            @endif
+        }
+    }"
+    x-init="initPrint()"
+>
     <x-page-heading
         title="Week {{$this->weekly_plan_no}}"
         subtitle="View weekly plan {{$this->weekly_plan_no}}"

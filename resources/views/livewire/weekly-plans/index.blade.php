@@ -27,9 +27,9 @@
                     {{$weekly_plan['total_cost']}}
                 </td>
                 <td>
-                    {{-- todo: forward to weekly plan view and window.print() --}}
                     <flux:button
                         icon="printer"
+                        wire:click="printPlan({{$weekly_plan['week_number']}})"
                     >
                         Print
                     </flux:button>

@@ -5,12 +5,16 @@ namespace App\Livewire\WeeklyPlans;
 use App\Models\Route;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class Show extends Component
 {
     #[Locked]
     public $weekly_plan_no;
+
+    #[Url]
+    public $print_now = false;
 
     #[Computed]
     public function routes() {
