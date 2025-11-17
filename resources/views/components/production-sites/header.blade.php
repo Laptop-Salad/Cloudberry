@@ -4,7 +4,7 @@
 >
 </x-page-heading>
 
-<flux:navbar>
+<flux:navbar class="mb-8">
     <flux:navbar.item
         :href="route('production-sites.show', $this->production_site->id)"
         :current="request()->routeIs('production-sites.show')"
