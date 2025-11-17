@@ -15,35 +15,56 @@
         <flux:button x-on:click="window.print()" icon="printer">Print</flux:button>
     </x-page-heading>
 
-    <flux:heading>Trucks</flux:heading>
+    <table class="basic-table mt-6">
+        <thead>
+        <tr>
+            <th>Truck</th>
+            <th>Production Site</th>
+            <th>Delivery Company</th>
+            <th>Scheduled At</th>
+            <th>Completed At</th>
+            <th>Fuel</th>
+            <th>Emission</th>
+            <th>Cost</th>
+        </tr>
+        </thead>
 
-    @foreach($this->routes as $route)
-        <p>Truck</p>
-        <p>{{$route->truck->truck_plate}}</p>
+        <tbody>
+        @foreach($this->routes as $route)
+            <tr>
+                <td>{{$route->truck->truck_plate}}</td>
 
-        <p>Production Site</p>
-        <p>{{$route->productionSite->name}}</p>
-        <p class="text-sm">{{$route->productionSite->location}}</p>
+                <td>
+                    <p>{{$route->productionSite->name}}</p>
+                    <p class="text-sm">{{$route->productionSite->location}}</p>
+                </td>
 
-        <p>Production Site</p>
-        <p>{{$route->deliveryCompany->name}}</p>
-        <p class="text-sm">{{$route->deliveryCompany->location}}</p>
+                <td>
+                    <p>{{$route->deliveryCompany->name}}</p>
+                    <p class="text-sm">{{$route->deliveryCompany->location}}</p>
+                </td>
 
-        <p>Scheduled At</p>
-        <p>{{$route->scheduled_at?->format('d-m-Y')}}</p>
+                <td>
+                    <p>{{$route->scheduled_at?->format('d-m-Y')}}</p>
+                </td>
 
-        <p>Completed At</p>
-        <p>{{$route->completed_at?->format('d-m-Y')}}</p>
+                <td>
+                    <p>{{$route->completed_at?->format('d-m-Y')}}</p>
+                </td>
 
-        {{-- NOTE: I know the wireframe doesnt specify date but I assume it needs to? If not then ignore this --}}
+                <td>
+                    <p>{{$route->fuel}}</p>
+                </td>
 
-        <p>Fuel Used</p>
-        <p>{{$route->fuel}}</p>
+                <td>
+                    <p>{{$route->emission}}</p>
+                </td>
 
-        <p>Emission</p>
-        <p>{{$route->emission}}</p>
-
-        <p>Cost</p>
-        <p>£{{$route->cost}}</p>
-    @endforeach
+                <td>
+                    <p>£{{$route->cost}}</p>
+                </td>
+            </tr>
+        @endforeach
+        </tbody>
+    </table>
 </div>
