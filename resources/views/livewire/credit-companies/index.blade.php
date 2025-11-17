@@ -30,15 +30,30 @@
                 <td>{{$credit_company->co2_required}}</td>
                 <td>{{$credit_company->target_delivery_year->format('Y')}}</td>
                 <td>
-                    <flux:button
-                        icon="cog-6-tooth"
-                        wire:click="$dispatch('edit-credit-company', { 'credit_company' : {{$credit_company->id}}})"
-                    >
-                        Manage
-                    </flux:button>
+                    <flux:dropdown>
+                        <flux:button icon:trailing="chevron-down">Options</flux:button>
+
+                        <flux:menu>
+                            <flux:menu.item
+                                icon="cog-6-tooth"
+                                wire:click="$dispatch('edit-credit-company', { 'credit_company' : {{$credit_company->id}}})"
+                            >
+                                Manage
+                            </flux:menu.item>
+
+                            <flux:menu.item
+                                icon="view-columns"
+                                wire:click="$dispatch('manage-credit-company-constraints', { 'credit_company' : {{$credit_company->id}}})"
+                            >
+                                Constraints
+                            </flux:menu.item>
+                        </flux:menu>
+                    </flux:dropdown>
                 </td>
             </tr>
         @endforeach
         </tbody>
     </table>
+
+    <livewire:credit-companies.manage-constraints />
 </div>
