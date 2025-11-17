@@ -13,7 +13,8 @@
         <div
             x-data="mapComponent({
                 sites: @js($this->production_sites),
-                delivery_companies: @js($this->delivery_companies)
+                delivery_companies: @js($this->delivery_companies),
+                routes: @js($this->routes)
             })"
             x-init="initMap()"
         >
@@ -23,7 +24,7 @@
 </div>
 
 <script>
-    function mapComponent({ sites, delivery_companies }) {
+    function mapComponent({ sites, delivery_companies, routes }) {
         return {
             map: null,
 
@@ -51,6 +52,21 @@
                     L.marker([site.lat, site.lng], { icon: redIcon })
                         .addTo(this.map)
                         .bindPopup(site.name);
+                });
+
+                routes.forEach(route => {
+                    const points = [
+                        [route.from.lat, route.from.lng],
+                        [route.to.lat, route.to.lng]
+                    ];
+
+                    const color = route.status === 'complete' ? 'green' : 'orange';
+
+                    L.polyline(points, {
+                        color: color,
+                        weight: 4
+                    }).addTo(this.map)
+                        .bindPopup(`Route for ${route.company}`);
                 });
             }
         }
