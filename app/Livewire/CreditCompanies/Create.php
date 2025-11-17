@@ -20,6 +20,14 @@ class Create extends Component
         $this->showForm();
     }
 
+    #[On(['duplicate-credit-company'])]
+    public function duplicate(CreditCompany $credit_company) {
+        $this->credit_company = $credit_company;
+        $this->form->fill($this->credit_company);
+        $this->form->target_delivery_year = $credit_company->target_delivery_year?->format('Y-m-d');
+        $this->show = true;
+    }
+
     public function showForm() {
         $this->form->reset();
 

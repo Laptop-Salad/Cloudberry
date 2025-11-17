@@ -53,6 +53,13 @@
                             >
                                 Constraints
                             </flux:menu.item>
+
+                            <flux:menu.item
+                                icon="document-duplicate"
+                                wire:click="$dispatch('duplicate-delivery-company', { 'delivery_company' : {{$delivery_company->id}}})"
+                            >
+                                Duplicate
+                            </flux:menu.item>
                         </flux:menu>
                     </flux:dropdown>
                 </td>

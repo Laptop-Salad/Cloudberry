@@ -65,18 +65,18 @@
                 wire:model="form.buffer_tank_size"
             />
 
-            <flux:select
-                label="Credit Company"
-                wire:model="form.credit_company_id"
-            >
-                <flux:select.option value="">Choose credit company</flux:select.option>
+{{--            <flux:select--}}
+{{--                label="Credit Company"--}}
+{{--                wire:model="form.credit_company_id"--}}
+{{--            >--}}
+{{--                <flux:select.option value="">Choose credit company</flux:select.option>--}}
 
-                @foreach($this->credit_companies as $company)
-                    <flux:select.option :value="$company->id">
-                        {{$company->name}}
-                    </flux:select.option>
-                @endforeach
-            </flux:select>
+{{--                @foreach($this->credit_companies as $company)--}}
+{{--                    <flux:select.option :value="$company->id">--}}
+{{--                        {{$company->name}}--}}
+{{--                    </flux:select.option>--}}
+{{--                @endforeach--}}
+{{--            </flux:select>--}}
 
             <x-form.footer />
         </form>

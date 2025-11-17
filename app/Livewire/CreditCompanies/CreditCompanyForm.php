@@ -28,6 +28,8 @@ class CreditCompanyForm extends Form
     public function set(CreditCompany $credit_company) {
         $this->credit_company = $credit_company;
         $this->fill($credit_company->toArray());
+
+        $this->target_delivery_year = $credit_company->target_delivery_year?->format('Y-m-d');
     }
 
     public function save() {

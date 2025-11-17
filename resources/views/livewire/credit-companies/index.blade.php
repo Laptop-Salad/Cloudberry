@@ -47,6 +47,13 @@
                             >
                                 Constraints
                             </flux:menu.item>
+
+                            <flux:menu.item
+                                icon="document-duplicate"
+                                wire:click="$dispatch('duplicate-credit-company', { 'credit_company' : {{$credit_company->id}}})"
+                            >
+                                Duplicate
+                            </flux:menu.item>
                         </flux:menu>
                     </flux:dropdown>
                 </td>

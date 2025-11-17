@@ -22,6 +22,13 @@ class Create extends Component
         $this->showForm();
     }
 
+    #[On(['duplicate-delivery-company'])]
+    public function duplicate(DeliveryCompany $delivery_company) {
+        $this->delivery_company = $delivery_company;
+        $this->form->fill($this->delivery_company);
+        $this->show = true;
+    }
+
     public function showForm() {
         $this->form->reset();
 

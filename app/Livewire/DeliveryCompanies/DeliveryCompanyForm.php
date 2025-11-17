@@ -38,9 +38,9 @@ class DeliveryCompanyForm extends Form
     public $buffer_tank_size;
 
 
-    #[Validate(['nullable', 'exists:credit_companies,id'])]
-    public $credit_company_id;
-
+//    #[Validate(['nullable', 'exists:credit_companies,id'])]
+//    public $credit_company_id;
+//
     public function set(DeliveryCompany $delivery_company) {
         $this->delivery_company = $delivery_company;
         $this->fill($delivery_company->toArray());
