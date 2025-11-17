@@ -14,6 +14,7 @@
             <th>COD</th>
             <th>Annual Obligations</th>
             <th>Weekly Obligations</th>
+            <th class="w-8"></th>
         </tr>
         </thead>
 
