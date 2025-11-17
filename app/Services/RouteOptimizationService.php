@@ -27,29 +27,31 @@ class RouteOptimizationService
      * Generate optimal routes based on available data
      * Returns detailed results with success/failure tracking
      */
-    public function generateOptimisedRoutes(?int $weekNumber = null, ?int $year = null): array
+    public function generateOptimisedRoutes(?int $weekNumber = null, ?int $year = null, bool $allowPastWeeks = false): array
     {
         // Default to current week
         $weekNumber = $weekNumber ?? now()->weekOfYear;
         $year = $year ?? now()->year;
 
         // Prevent generating routes for past weeks
-        $currentWeek = now()->weekOfYear;
-        $currentYear = now()->year;
+        if (!$allowPastWeeks) {
+            $currentWeek = now()->weekOfYear;
+            $currentYear = now()->year;
 
-        if ($year < $currentYear || ($year == $currentYear && $weekNumber < $currentWeek)) {
-            return [
-                'success' => [],
-                'failed' => [],
-                'summary' => [
-                    'error' => 'Cannot generate routes for past weeks',
-                    'requested_week' => $weekNumber,
-                    'requested_year' => $year,
-                    'current_week' => $currentWeek,
-                    'current_year' => $currentYear,
-                    'message' => 'Routes can only be generated for current week onwards',
-                ],
-            ];
+            if ($year < $currentYear || ($year == $currentYear && $weekNumber < $currentWeek)) {
+                return [
+                    'success' => [],
+                    'failed' => [],
+                    'summary' => [
+                        'error' => 'Cannot generate routes for past weeks',
+                        'requested_week' => $weekNumber,
+                        'requested_year' => $year,
+                        'current_week' => $currentWeek,
+                        'current_year' => $currentYear,
+                        'message' => 'Routes can only be generated for current week onwards',
+                    ],
+                ];
+            }
         }
 
         // Check if trying to skip weeks
@@ -278,8 +280,11 @@ class RouteOptimizationService
             return $aProgress <=> $bProgress; // Deliver to those most behind first
         });
 
-// Fit as many as possible within buffer capacity
-        $weeklyMax = min($company->weekly_max ?? 58, $company->buffer_tank_size);
+        // Check company buffer capacity before selecting obligations
+        $companyAvailableBuffer = $this->getCompanyAvailableBuffer($company, $weekNumber, $year);
+
+        // Fit as many as possible within buffer capacity (respects both weekly_max and buffer_tank_size)
+        $weeklyMax = min($company->weekly_max ?? PHP_FLOAT_MAX, $companyAvailableBuffer); // Use BUFFER SIZE!
         $selectedObligations = [];
         $totalWeeklyRequired = 0;
 
@@ -292,15 +297,13 @@ class RouteOptimizationService
 
         $creditObligations = $selectedObligations;
 
-        // Check company buffer capacity
-        $availableBuffer = $this->getCompanyAvailableBuffer($company, $weekNumber, $year);
-        if ($availableBuffer < $totalWeeklyRequired) {
+        if (empty($creditObligations)) {
             return [
                 'success' => false,
                 'reason' => 'Insufficient buffer tank capacity for credit obligations',
                 'details' => [
                     'required' => $totalWeeklyRequired,
-                    'available_buffer' => $availableBuffer,
+                    'available_buffer' => $companyAvailableBuffer,
                 ],
             ];
         }
@@ -1058,7 +1061,7 @@ class RouteOptimizationService
     /**
      * Force regenerate routes for a week (deletes existing and creates new)
      */
-    public function forceRegenerateWeek(int $week, int $year): array
+    public function forceRegenerateWeek(int $week, int $year, bool $allowPastWeeks = false): array
     {
         // Delete existing routes for this week
         Route::where('week_number', $week)
@@ -1077,7 +1080,7 @@ class RouteOptimizationService
         $this->clearRouteCache($week, $year);
 
         // Generate fresh routes
-        return $this->generateOptimisedRoutes($week, $year);
+        return $this->generateOptimisedRoutes($week, $year, $allowPastWeeks);
     }
 
     /**
