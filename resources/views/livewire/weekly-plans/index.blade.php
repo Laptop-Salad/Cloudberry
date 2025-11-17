@@ -38,8 +38,4 @@
         @endforeach
         </tbody>
     </table>
-
-    <div>
-        {{$this->weekly_plans->paginate()}}
-    </div>
 </div>
