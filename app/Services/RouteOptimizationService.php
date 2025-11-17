@@ -390,7 +390,7 @@ class RouteOptimizationService
                     'trip_number' => $trip,
                     'total_trips' => $tripsNeeded,
                     'estimated_duration_minutes' => $estimatedDuration,
-                    'scheduled_at' => now()->addWeek()->startOfWeek()->addDays(($trip - 1)),
+                    'scheduled_at' => $this->calculateScheduledTime($weekNumber, $year, $trip),
                     'is_early_delivery' => $creditCompany->target_delivery_year->year > $year, // Track early deliveries
                 ]);
 
@@ -604,7 +604,7 @@ class RouteOptimizationService
                 'trip_number' => $trip,
                 'total_trips' => $tripsNeeded,
                 'estimated_duration_minutes' => $estimatedDuration,
-                'scheduled_at' => now()->addWeek()->startOfWeek()->addDays(($trip - 1)),
+                'scheduled_at' => $this->calculateScheduledTime($weekNumber, $year, $trip),
             ]);
 
             $generatedRoutes[] = $route->load(['truck.truckType', 'productionSite', 'deliveryCompany']);
@@ -1146,5 +1146,29 @@ class RouteOptimizationService
         }
 
         return 0;
+    }
+
+    /**
+     * Calculate realistic scheduled time for a route
+     * Spreads routes across the week during business hours
+     */
+    private function calculateScheduledTime(int $weekNumber, int $year, int $tripNumber): \Carbon\Carbon
+    {
+        // Get start of the target week
+        $weekStart = \Carbon\Carbon::now()
+            ->setISODate($year, $weekNumber)
+            ->startOfWeek(); // Monday
+
+        // Spread trips across weekdays (Monday-Friday)
+        $dayOffset = ($tripNumber - 1) % 5; // 0-4 for Mon-Fri
+
+        // Business hours: 8 AM - 4 PM start times
+        $startHours = [8, 9, 10, 11, 13, 14, 15, 16]; // Skip 12 PM (lunch)
+        $hourIndex = ($tripNumber - 1) % count($startHours);
+        $startHour = $startHours[$hourIndex];
+
+        return $weekStart
+            ->addDays($dayOffset)
+            ->setTime($startHour, 0, 0);
     }
 }
