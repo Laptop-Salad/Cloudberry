@@ -1,5 +1,5 @@
 <div x-data="mapComponent()" x-init="initMap()">
-    <div id="map" style="height:500px; width:100%;"></div>
+    <div id="map" style="height:500px; width:100%;" class="relative !z-10"></div>
 </div>
 
 <script>

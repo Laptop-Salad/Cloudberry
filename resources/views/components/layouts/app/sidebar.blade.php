@@ -21,7 +21,7 @@
 </head>
 
 <body class="min-h-screen bg-white text-black dark:bg-zinc-800 dark:text-white">
-<div x-data="{ open: false }">
+<div x-data="{ open: false }" class="z-50">
 
     {{-- Mobile toggle button --}}
     <button
