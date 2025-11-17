@@ -22,7 +22,9 @@
         @foreach($this->trucks as $truck)
             <tr>
                 <td class="font-medium">
-                    {{$truck->truck_plate}}
+                    <flux:link :href="route('trucks.show', $truck->id)">
+                        {{$truck->truck_plate}}
+                    </flux:link>
                 </td>
                 <td>{{$truck->co2_capacity}} Tonnes</td>
                 <td>{{$truck->productionSite?->name ?? '-'}}</td>

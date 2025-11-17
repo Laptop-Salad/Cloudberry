@@ -17,6 +17,7 @@ Route::middleware(['auth'])->group(function () {
 
     /** Trucks */
     Route::get('trucks', App\Livewire\Trucks\Index::class)->name('trucks');
+    Route::get('trucks/{truck}', App\Livewire\Trucks\Show::class)->name('trucks.show');
 
     /** Production Sites */
     Route::get('production-sites', App\Livewire\ProductionSites\Index::class)->name('production-sites');
