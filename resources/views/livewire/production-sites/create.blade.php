@@ -4,7 +4,7 @@
     </flux:modal.trigger>
 
     <flux:modal wire:model="show" class="w-6xl">
-        <flux:heading size="lg">Create Production Site</flux:heading>
+        <flux:heading size="lg">{{isset($this->production_site) ? 'Manage' : 'Edit'}} Production Site</flux:heading>
 
         <form wire:submit="save" class="mt-6 space-y-6">
             <flux:input

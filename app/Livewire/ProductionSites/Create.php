@@ -20,6 +20,7 @@ class Create extends Component
     #[On(['edit-production-site'])]
     public function edit(ProductionSite $production_site) {
         $this->production_site = $production_site;
+        $this->form->set($production_site);
         $this->showForm();
     }
 
