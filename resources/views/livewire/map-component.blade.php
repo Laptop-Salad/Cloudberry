@@ -3,18 +3,6 @@
 
     <flux:separator />
 
-    <div class="flex space-x-2 mt-8">
-        <flux:input
-            label="Site Search"
-            wire:model.live="search_sites"
-        />
-
-        <flux:input
-            label="Truck Search"
-            wire:model.live="search_trucks"
-        />
-    </div>
-
     <div wire:ignore class="mt-8 relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
         <div
             x-data="mapComponent({
@@ -26,6 +14,18 @@
         >
             <div id="map" style="height:500px; width:100%;" class="relative !z-10"></div>
         </div>
+    </div>
+
+    <div class="flex space-x-2 mt-8">
+        <flux:input
+            label="Site Search"
+            wire:model.live="search_sites"
+        />
+
+        <flux:input
+            label="Truck Search"
+            wire:model.live="search_trucks"
+        />
     </div>
 </div>
 
