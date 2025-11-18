@@ -8,10 +8,6 @@ use Livewire\Volt\Volt;
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
-
 Route::middleware(['auth'])->group(function () {
     Route::view('dashboard', 'dashboard') ->name('dashboard');
 
