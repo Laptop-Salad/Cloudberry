@@ -19,9 +19,15 @@ class UserForm extends Form
     #[Validate(['required', 'max:255'])]
     public $password;
 
+    #[Validate(['nullable', 'exists:roles,id'])]
+    public $role_id;
+
     public function set(User $user) {
         $this->user = $user;
         $this->fill($user->toArray());
+
+        // set users role
+        $this->role_id = $user->roles->first()->id;
     }
 
     public function save() {
@@ -44,5 +50,12 @@ class UserForm extends Form
         $this->user->fill($this->all());
 
         $this->user->save();
+
+        // save role
+        if (isset($this->role_id)) {
+            $this->user->roles()->sync([$this->role_id]);
+        } else {
+            $this->user->roles()->detach();
+        }
     }
 }

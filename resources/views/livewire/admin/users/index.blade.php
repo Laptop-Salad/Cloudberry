@@ -10,6 +10,7 @@
         <thead>
         <tr>
             <th>Name</th>
+            <th>Role</th>
             <th class="w-8"></th>
         </tr>
         </thead>
@@ -19,7 +20,10 @@
             <tr>
                 <td class="font-medium">{{$user->name}}</td>
                 <td>
-                    <flux:button icon="cog-6-tooth" wire:click="$dispatch('edit-user', { 'truck' : {{$user->id}}})">Manage</flux:button>
+                    {{$user->roles->first()?->name ?? 'None'}}
+                </td>
+                <td>
+                    <flux:button icon="cog-6-tooth" wire:click="$dispatch('edit-user', { 'user' : {{$user->id}}})">Manage</flux:button>
                 </td>
             </tr>
         @endforeach

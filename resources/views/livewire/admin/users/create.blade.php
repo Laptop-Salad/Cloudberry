@@ -20,6 +20,19 @@
                 required
             />
 
+            <flux:select
+                label="Role"
+                wire:model="form.role_id"
+            >
+                <flux:select.option value="">Choose type</flux:select.option>
+
+                @foreach($this->roles as $role)
+                    <flux:select.option :value="$role->id">
+                        {{$role->name}}
+                    </flux:select.option>
+                @endforeach
+            </flux:select>
+
             <x-form.footer />
         </form>
     </flux:modal>

@@ -3,8 +3,10 @@
 namespace App\Livewire\Admin\Users;
 
 use App\Models\User;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Spatie\Permission\Models\Role;
 
 class Create extends Component
 {
@@ -17,6 +19,7 @@ class Create extends Component
     #[On(['edit-user'])]
     public function edit(User $user) {
         $this->user = $user;
+        $this->form->set($user);
         $this->showForm();
     }
 
@@ -38,10 +41,20 @@ class Create extends Component
         $this->show = false;
         $this->form->reset();
 
-        $this->js('alert("Password: ' . $generated_password . '")');
+        // dont display password if we are editing
+        if (!isset($this->user)) {
+            $this->js('alert("Password: ' . $generated_password . '")');
+        }
 
         // notify parents to refresh
         $this->dispatch('refresh-users');
+    }
+
+    #[Computed]
+    public function roles() {
+        return Role::query()
+            ->orderBy('name')
+            ->get();
     }
 
     public function render()
