@@ -20,7 +20,7 @@
         <flux:field>
             <flux:label class="bg-[#EFFF00]">Site Search</flux:label>
 
-            <flux:input wire:model="search_sites" />
+            <flux:input wire:model.live="search_sites" />
 
             <flux:error name="search_sites" />
         </flux:field>
@@ -28,7 +28,7 @@
         <flux:field>
             <flux:label class="bg-[#EFFF00]">Truck Search</flux:label>
 
-            <flux:input wire:model="search_trucks" />
+            <flux:input wire:model.live="search_trucks" />
 
             <flux:error name="search_trucks" />
         </flux:field>
