@@ -18,7 +18,7 @@
 
     <div class="flex space-x-2 mt-8">
         <flux:field>
-            <flux:label class="bg-[#EFFF00]">Site Search</flux:label>
+            <flux:label class="bg-[#EFFF00] dark:text-black">Site Search</flux:label>
 
             <flux:input wire:model.live="search_sites" />
 
@@ -26,7 +26,7 @@
         </flux:field>
 
         <flux:field>
-            <flux:label class="bg-[#EFFF00]">Truck Search</flux:label>
+            <flux:label class="bg-[#EFFF00] dark:text-black">Truck Search</flux:label>
 
             <flux:input wire:model.live="search_trucks" />
 

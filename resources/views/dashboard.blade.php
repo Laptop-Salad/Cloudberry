@@ -4,7 +4,7 @@
             <livewire:map-component />
         </div>
 
-        <div class="lg:grid grid-cols-2">
+        <div class="">
             <livewire:dashboard.upcoming-events />
         </div>
     </div>
